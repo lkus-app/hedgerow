@@ -1,0 +1,73 @@
+@import url('https://fonts.googleapis.com/css2?family=Geologica:wght@700;800;900&family=Permanent+Marker&family=Poppins:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #F3F4F6;
+  --surface: #FFFFFF;
+  --lavender: #EFE8F2;
+  --blush: #F1E0ED;
+  --sky: #38CCFF;
+  --coral: #FF5E64;
+  --pink: #FFA3CC;
+  --navy: #005174;
+  --charcoal: #504E57;
+  --butter: #FAD869;
+  --ink: #000000;
+
+  --font-poppins: 'Poppins', sans-serif;
+  --font-geologica: 'Geologica', sans-serif;
+  --font-marker: 'Permanent Marker', cursive;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--charcoal);
+  font-family: var(--font-poppins);
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom Inset frame rule */
+.page-inset-wrapper {
+  padding: 16px;
+  background-color: var(--bg);
+  min-height: 100vh;
+}
+
+@media (max-width: 768px) {
+  .page-inset-wrapper {
+    padding: 8px;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #F3F4F6;
+}
+::-webkit-scrollbar-thumb {
+  background: #FFA3CC;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #FF5E64;
+}
+
+/* Selection */
+::selection {
+  background-color: #FFA3CC;
+  color: #005174;
+}
+
+/* Focus styles */
+button:focus-visible, a:focus-visible {
+  outline: 3px solid #005174;
+  outline-offset: 2px;
+}

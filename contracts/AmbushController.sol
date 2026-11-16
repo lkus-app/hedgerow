@@ -1,0 +1,98 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+interface IHedgerowVault {
+    function recordAmbushProfit(uint256 profitAmount) external payable;
+}
+
+interface IWealdToken {
+    function mintAmbushReward(address to, uint256 amount) external;
+    function awardOGBadge(address account, uint256 badgeId) external;
+}
+
+/**
+ * @title AmbushController
+ * @author Hedgerow Protocol
+ * @notice AI Sentinel automation controller for Robinhood Chain.
+ *         Monitors off-hours short borrow rates and triggers automated gamma sweeps.
+ */
+contract AmbushController {
+    address public owner;
+    address public aiSentinel; // Friar-1 Autonomous Agent
+    address public wealdToken;
+
+    struct AmbushTarget {
+        string ticker;          // e.g. "GME-RWA" or "NVDA-RWA"
+        address vaultAddress;
+        uint256 shortBorrowAPR; // in basis points (e.g. 14200 = 142%)
+        bool isOffHoursActive;
+        uint256 lastAmbushTime;
+    }
+
+    mapping(bytes32 => AmbushTarget) public targets;
+    bytes32[] public activeTargetKeys;
+
+    event AmbushTriggered(bytes32 indexed targetKey, string ticker, uint256 borrowAPR, uint256 sweptYield);
+    event SentinelUpdated(address indexed newSentinel);
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Controller: not owner");
+        _;
+    }
+
+    modifier onlySentinel() {
+        require(msg.sender == aiSentinel || msg.sender == owner, "Controller: not authorized sentinel");
+        _;
+    }
+
+    constructor(address _aiSentinel, address _wealdToken) {
+        owner = msg.sender;
+        aiSentinel = _aiSentinel;
+        wealdToken = _wealdToken;
+    }
+
+    function setSentinel(address _newSentinel) external onlyOwner {
+        aiSentinel = _newSentinel;
+        emit SentinelUpdated(_newSentinel);
+    }
+
+    function registerTarget(
+        string memory ticker,
+        address vaultAddress
+    ) external onlyOwner {
+        bytes32 key = keccak256(abi.encodePacked(ticker));
+        targets[key] = AmbushTarget({
+            ticker: ticker,
+            vaultAddress: vaultAddress,
+            shortBorrowAPR: 0,
+            isOffHoursActive: true,
+            lastAmbushTime: block.timestamp
+        });
+        activeTargetKeys.push(key);
+    }
+
+    /**
+     * @notice Called autonomously by the Friar AI agent when off-market borrow fees or gamma sweeps trigger
+     */
+    function executeAmbushSweep(
+        bytes32 targetKey,
+        uint256 reportedAPR
+    ) external payable onlySentinel {
+        AmbushTarget storage target = targets[targetKey];
+        require(target.vaultAddress != address(0), "Controller: target not found");
+        target.shortBorrowAPR = reportedAPR;
+        target.lastAmbushTime = block.timestamp;
+
+        // Forward profit to vault
+        if (msg.value > 0) {
+            IHedgerowVault(target.vaultAddress).recordAmbushProfit{value: msg.value}(msg.value);
+        }
+
+        // Mint incentive $WEALD rewards to participating stakers
+        if (wealdToken != address(0)) {
+            IWealdToken(wealdToken).mintAmbushReward(target.vaultAddress, 500 * 10**18);
+        }
+
+        emit AmbushTriggered(targetKey, target.ticker, reportedAPR, msg.value);
+    }
+}
