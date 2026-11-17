@@ -1,0 +1,79 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Hedgerow X banner</title>
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@800;900&family=Permanent+Marker&family=Poppins:wght@500;600;700&display=block" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; }
+  body { width: 1500px; height: 500px; overflow: hidden; background: #38CCFF; }
+  .banner {
+    position: relative; width: 1500px; height: 500px; overflow: hidden;
+    background:
+      radial-gradient(rgba(0, 81, 116, 0.18) 2px, transparent 2px) 0 0 / 28px 28px,
+      linear-gradient(120deg, #38CCFF 0%, #5ad6ff 55%, #38CCFF 100%);
+    font-family: "Poppins", sans-serif; color: #005174;
+  }
+  .blob { position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.55; }
+  .blob.coral { width: 420px; height: 420px; right: 120px; top: -160px; background: #FFA3CC; }
+  .blob.butter { width: 360px; height: 360px; left: 520px; bottom: -220px; background: #FAD869; }
+
+  /* Text sits right of the lower-left area that X covers with the profile photo. */
+  .copy { position: absolute; left: 410px; top: 78px; width: 640px; }
+  .eyebrow {
+    display: inline-block; background: #005174; color: #fff; font-weight: 700;
+    font-size: 15px; letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 6px 12px; border-radius: 6px;
+  }
+  .wordmark {
+    font-family: "Geologica", sans-serif; font-weight: 900; font-size: 112px;
+    line-height: 0.95; letter-spacing: -0.02em; margin: 18px 0 6px; color: #005174;
+  }
+  .script {
+    font-family: "Permanent Marker", cursive; font-size: 33px; white-space: nowrap; color: #FF5E64;
+    line-height: 1.05; text-shadow: 2px 2px 0 rgba(255, 255, 255, 0.55);
+  }
+  .chips { display: flex; gap: 8px; margin-top: 24px; flex-wrap: nowrap; white-space: nowrap; }
+  .chip {
+    background: rgba(255, 255, 255, 0.85); border: 2px solid rgba(255, 255, 255, 0.9);
+    color: #005174; font-weight: 600; font-size: 15px; padding: 7px 12px; border-radius: 8px;
+  }
+  .chip b { font-weight: 700; color: #FF5E64; }
+
+  .sticker {
+    position: absolute; right: 80px; top: 84px; width: 310px; height: 310px;
+    background: #fff; border-radius: 22px; padding: 14px; transform: rotate(-5deg);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+  }
+  .sticker .img {
+    width: 100%; height: 100%; border-radius: 14px;
+    background: url("../public/hedgerow-3d-cad-icon.jpg") center / 112% no-repeat #0e1c31;
+  }
+  .tag {
+    position: absolute; right: 70px; bottom: 54px; transform: rotate(-5deg);
+    background: #FF5E64; color: #fff; font-family: "Geologica", sans-serif; font-weight: 800;
+    font-size: 22px; padding: 8px 18px; border-radius: 999px; box-shadow: 0 8px 18px rgba(0,0,0,0.18);
+  }
+</style>
+</head>
+<body>
+  <div class="banner">
+    <div class="blob coral"></div>
+    <div class="blob butter"></div>
+
+    <div class="copy">
+      <span class="eyebrow">Robinhood Chain &middot; Chain ID 4663</span>
+      <div class="wordmark">hedgerow</div>
+      <div class="script">We bake sweet revenge for retail.</div>
+      <div class="chips">
+        <span class="chip"><b>Equity Basket</b> NVDA &middot; META &middot; AAPL &middot; TSLA</span>
+        <span class="chip">Chainlink-priced</span>
+        <span class="chip">Withdraw any time</span>
+      </div>
+    </div>
+
+    <div class="sticker"><div class="img"></div></div>
+    <div class="tag">$WEALD</div>
+  </div>
+</body>
+</html>

@@ -60,10 +60,10 @@ export const vaultAddresses: Record<VaultId, Address | undefined> = {
 /** $WEALD token contract address (the "CA"), printed by the deploy script. */
 export const wealdTokenAddress = asAddress(process.env.NEXT_PUBLIC_WEALD_TOKEN);
 
-/** Public project links. Unset links render as disabled buttons rather than placeholders. */
+/** Public project links (env vars override the official defaults). */
 export const projectLinks = {
-  x: process.env.NEXT_PUBLIC_X_URL || undefined,
-  website: process.env.NEXT_PUBLIC_WEBSITE_URL || undefined,
+  x: process.env.NEXT_PUBLIC_X_URL || "https://x.com/Hedgerowft",
+  website: process.env.NEXT_PUBLIC_WEBSITE_URL || "https://www.hedgerow.click/",
 };
 
 export const explorerAddressUrl = (address: string) => {

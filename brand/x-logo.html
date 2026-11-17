@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Hedgerow X logo</title>
+<style>
+  html, body { margin: 0; padding: 0; }
+  body { width: 400px; height: 400px; overflow: hidden; background: #0e1c31; }
+  .frame {
+    position: relative; width: 400px; height: 400px; overflow: hidden;
+    background: radial-gradient(circle at 50% 45%, #1d4f86 0%, #13305a 55%, #0e1c31 100%);
+  }
+  /* Scale the CAD render so its rounded frame falls outside X's circle crop. */
+  .art {
+    position: absolute; width: 520px; height: 520px; left: -60px; top: -54px;
+    background: url("../public/hedgerow-3d-cad-icon.jpg") center / cover no-repeat;
+  }
+  /* Thin sky ring just inside the circle X will show. */
+  .ring {
+    position: absolute; inset: 6px; border-radius: 50%;
+    box-shadow: inset 0 0 0 6px #38CCFF;
+  }
+</style>
+</head>
+<body>
+  <div class="frame">
+    <div class="art"></div>
+    <div class="ring"></div>
+  </div>
+</body>
+</html>
