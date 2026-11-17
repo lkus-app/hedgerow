@@ -9,7 +9,6 @@ import { CaseStudy, CaseStudyItem } from "@/components/ui/CaseStudy";
 import { IndustryTile } from "@/components/ui/IndustryTile";
 import { BlogCard, BlogPost } from "@/components/ui/BlogCard";
 import { BentoMosaic } from "@/components/ui/BentoMosaic";
-import { SocialIcons } from "@/components/ui/SocialIcons";
 import { FloatingHelpButton } from "@/components/ui/FloatingHelpButton";
 import { ScrollIndicator } from "@/components/ui/ScrollIndicator";
 import { BackToTop } from "@/components/ui/BackToTop";
@@ -257,13 +256,8 @@ export default function Home() {
                 start an ambush ›
               </Button>
 
-              {/* Social icons row + Chain Explorer link */}
-              <div className="flex items-center justify-between pt-2 border-t border-lavender/70">
-                <SocialIcons color="coral" />
-                <span className="text-xs font-mono font-bold text-charcoal/70 bg-lavender/60 px-2.5 py-1 rounded-tag">
-                  L2 Mainnet
-                </span>
-              </div>
+              {/* X, Website and contract address */}
+              <ProjectLinks tone="light" className="pt-4 border-t border-lavender/70" />
             </div>
           </div>
 

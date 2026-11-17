@@ -5,8 +5,25 @@ import { explorerAddressUrl, projectLinks, wealdTokenAddress } from "@/lib/chain
 
 const base =
   "inline-flex items-center justify-center gap-2 h-12 px-5 rounded-tile font-sans font-bold text-[15px] transition-all select-none";
-const enabled = "bg-white text-navy hover:bg-butter shadow-soft hover:shadow-lift";
-const disabled = "bg-white/25 text-white/70 cursor-not-allowed";
+// "dark" sits on the coral footer, "light" on the white hero card.
+const tones = {
+  dark: {
+    enabled: "bg-white text-navy hover:bg-butter shadow-soft hover:shadow-lift",
+    disabled: "bg-white/25 text-white/70 cursor-not-allowed",
+    caBox: "bg-white shadow-soft",
+    caBoxOff: "bg-white/25",
+    caText: "text-navy hover:bg-butter transition-colors",
+    caTextOff: "text-white/70 cursor-not-allowed",
+  },
+  light: {
+    enabled: "bg-coral text-white hover:brightness-95 shadow-soft hover:shadow-lift",
+    disabled: "bg-lavender text-charcoal/50 cursor-not-allowed",
+    caBox: "bg-lavender/70",
+    caBoxOff: "bg-lavender/50",
+    caText: "text-navy hover:bg-butter transition-colors",
+    caTextOff: "text-charcoal/50 cursor-not-allowed",
+  },
+};
 
 const XLogo = () => (
   <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor" aria-hidden="true">
@@ -15,7 +32,11 @@ const XLogo = () => (
 );
 
 /** X, contract address and website buttons. Unconfigured links are shown disabled, never faked. */
-export const ProjectLinks: React.FC<{ className?: string }> = ({ className = "" }) => {
+export const ProjectLinks: React.FC<{ className?: string; tone?: keyof typeof tones }> = ({
+  className = "",
+  tone = "dark",
+}) => {
+  const { enabled, disabled, caBox, caBoxOff, caText, caTextOff } = tones[tone];
   const [copied, setCopied] = useState(false);
   const ca = wealdTokenAddress;
 
@@ -55,13 +76,13 @@ export const ProjectLinks: React.FC<{ className?: string }> = ({ className = "" 
         )}
       </div>
 
-      <div className={`flex items-stretch rounded-tile overflow-hidden ${ca ? "bg-white shadow-soft" : "bg-white/25"}`}>
+      <div className={`flex items-stretch rounded-tile overflow-hidden ${ca ? caBox : caBoxOff}`}>
         <button
           onClick={copyCa}
           disabled={!ca}
           aria-label={ca ? "Copy $WEALD contract address" : "$WEALD contract not deployed"}
           className={`flex-1 min-w-0 flex items-center gap-3 px-4 h-12 text-left ${
-            ca ? "text-navy hover:bg-butter transition-colors" : "text-white/70 cursor-not-allowed"
+            ca ? caText : caTextOff
           }`}
         >
           <span className="shrink-0 font-sans font-bold text-[15px]">CA</span>
