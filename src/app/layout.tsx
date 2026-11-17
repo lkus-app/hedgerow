@@ -16,7 +16,9 @@ export const metadata: Metadata = {
     "Arbitrum Orbit",
   ],
   icons: {
-    icon: "/favicon.ico",
+    icon: "/hedgerow-3d-cad-icon.jpg",
+    shortcut: "/hedgerow-3d-cad-icon.jpg",
+    apple: "/hedgerow-3d-cad-icon.jpg",
   },
 };
 

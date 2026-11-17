@@ -176,12 +176,16 @@ export default function Home() {
       <section className="min-h-screen w-full flex flex-col justify-between pt-2 pb-6">
         {/* Top bar on small devices */}
         <div className="lg:hidden flex items-center justify-between py-4 px-2 mb-2">
-          <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-tile bg-pink flex items-center justify-center text-xl font-black text-navy shadow-sm">
-              H
+          <div className="flex items-center gap-2.5">
+            <div className="w-11 h-11 rounded-tile overflow-hidden shadow-soft border-2 border-pink bg-navy flex-shrink-0">
+              <img
+                src="/hedgerow-3d-cad-icon.jpg"
+                alt="Hedgerow 3D CAD Icon"
+                className="w-full h-full object-cover"
+              />
             </div>
             <div>
-              <span className="font-display font-black text-xl text-navy tracking-tight">hedgerow</span>
+              <span className="font-display font-black text-xl text-navy tracking-tight block leading-tight">hedgerow</span>
               <span className="block text-[10px] font-mono font-bold text-coral uppercase tracking-wider">
                 alpha lab · rwh-l2
               </span>
@@ -200,9 +204,13 @@ export default function Home() {
           {/* Left Column (~35% -> lg:col-span-4 or 5) */}
           <div className="lg:col-span-5 flex flex-col justify-between bg-bg p-4 sm:p-6 lg:p-8 rounded-panel border-2 border-lavender/60 shadow-soft">
             {/* Logo Mark */}
-            <div className="hidden lg:flex items-center gap-3">
-              <div className="w-14 h-14 rounded-tile bg-pink flex items-center justify-center text-2xl font-black text-navy shadow-soft hover:rotate-6 transition-transform">
-                H
+            <div className="hidden lg:flex items-center gap-3.5">
+              <div className="w-16 h-16 rounded-tile overflow-hidden shadow-soft hover:shadow-lift border-2 border-pink bg-navy flex-shrink-0 hover:rotate-3 transition-transform">
+                <img
+                  src="/hedgerow-3d-cad-icon.jpg"
+                  alt="Hedgerow 3D CAD Icon"
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div>
                 <span className="font-display font-black text-2xl text-navy tracking-tight block leading-none">
@@ -511,8 +519,14 @@ export default function Home() {
             <div>
               {/* Sticker Illustration */}
               <div className="inline-block p-4 bg-white rounded-card shadow-lift transform -rotate-3 hover:rotate-0 transition-transform mb-6">
-                <div className="flex items-center gap-3">
-                  <span className="text-5xl">🥐🏹</span>
+                <div className="flex items-center gap-3.5">
+                  <div className="w-16 h-16 rounded-tile overflow-hidden shadow-soft border-2 border-lavender bg-navy flex-shrink-0">
+                    <img
+                      src="/hedgerow-3d-cad-icon.jpg"
+                      alt="Hedgerow 3D CAD Icon"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                   <div>
                     <span className="font-display font-black text-2xl text-navy block leading-none">
                       HEDGEROW

@@ -39,26 +39,30 @@ export const BentoMosaic: React.FC = () => {
         </div>
       </motion.div>
 
-      {/* TILE 2: Coral Tile (The Outlaw Baker Mascot) */}
+      {/* TILE 2: Coral Tile (The Outlaw Baker Mascot & 3D CAD Icon) */}
       <motion.div
         whileHover={{ scale: 0.99 }}
-        className="col-span-1 md:col-span-2 row-span-1 bg-coral p-4 sm:p-6 flex items-center justify-between rounded-tile text-white relative overflow-hidden group"
+        className="col-span-1 md:col-span-2 row-span-1 bg-coral p-4 sm:p-5 flex items-center justify-between rounded-tile text-white relative overflow-hidden group"
       >
-        <div className="relative z-10 max-w-[65%]">
-          <span className="text-xs font-mono font-bold uppercase bg-white/20 px-2 py-0.5 rounded-tag mb-2 inline-block">
-            Mascot of the Greenwood
+        <div className="relative z-10 max-w-[60%]">
+          <span className="text-[10px] sm:text-xs font-mono font-bold uppercase bg-white/20 px-2 py-0.5 rounded-tag mb-1.5 inline-block">
+            3D CAD Prototype · v1.0
           </span>
-          <h4 className="font-display font-black text-xl sm:text-2xl lg:text-3xl leading-tight">
-            Meet Friar Tuck &amp; The Doughboy
+          <h4 className="font-display font-black text-lg sm:text-2xl lg:text-3xl leading-tight">
+            The Greenwood Compound Bow
           </h4>
-          <p className="font-sans text-xs sm:text-sm text-white/90 mt-1">
-            ambushing overleveraged 13F short positions while TradFi sleeps.
+          <p className="font-sans text-xs sm:text-sm text-white/90 mt-1 line-clamp-2">
+            engineered golden mechanical croissant with CNC dual-cams and chamfered titanium limbs.
           </p>
         </div>
 
-        {/* Playful Animated Pastry Archer */}
-        <div className="relative z-10 text-5xl sm:text-6xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
-          🥐🏹
+        {/* 3D CAD Render Thumbnail */}
+        <div className="relative z-10 w-24 h-24 sm:w-28 sm:h-28 rounded-card overflow-hidden shadow-lift border-2 border-white/60 group-hover:scale-105 group-hover:rotate-3 transition-all duration-300 flex-shrink-0 bg-navy">
+          <img
+            src="/hedgerow-3d-cad-icon.jpg"
+            alt="Hedgerow 3D CAD Compound Bow & Croissant Emblem"
+            className="w-full h-full object-cover"
+          />
         </div>
 
         {/* Shimmer background */}
