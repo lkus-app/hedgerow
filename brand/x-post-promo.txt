@@ -1,0 +1,7 @@
+$WEALD is live on Robinhood Chain.
+
+Hedgerow: open-source vaults for tokenized stocks. First up, the Equity Basket: one ETH deposit into NVDA, META, AAPL and TSLA, priced by Chainlink. Withdraw any time.
+
+CA: 0x6a725216978E452a733aBc2dcDBb69C6575468c1
+
+hedgerow.click

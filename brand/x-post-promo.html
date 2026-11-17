@@ -1,0 +1,96 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Hedgerow promo</title>
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@800;900&family=Permanent+Marker&family=Poppins:wght@500;600;700&display=block" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; }
+  body { width: 1600px; height: 900px; overflow: hidden; background: #005174; }
+  .card {
+    position: relative; width: 1600px; height: 900px; overflow: hidden;
+    background:
+      radial-gradient(rgba(56, 204, 255, 0.16) 2px, transparent 2px) 0 0 / 30px 30px,
+      linear-gradient(135deg, #005174 0%, #003b54 60%, #00283a 100%);
+    font-family: "Poppins", sans-serif; color: #fff;
+  }
+  .glow { position: absolute; border-radius: 50%; filter: blur(90px); }
+  .glow.sky { width: 620px; height: 620px; right: -80px; top: -120px; background: rgba(56, 204, 255, 0.35); }
+  .glow.coral { width: 520px; height: 520px; left: -160px; bottom: -220px; background: rgba(255, 94, 100, 0.35); }
+
+  .copy { position: absolute; left: 110px; top: 118px; width: 860px; }
+  .eyebrow {
+    display: inline-block; background: #38CCFF; color: #003b54; font-weight: 700;
+    font-size: 22px; letter-spacing: 0.14em; text-transform: uppercase;
+    padding: 9px 18px; border-radius: 8px;
+  }
+  .soon {
+    font-family: "Permanent Marker", cursive; color: #FAD869; font-size: 112px; white-space: nowrap;
+    line-height: 0.95; margin: 28px 0 10px; transform: rotate(-2deg); transform-origin: left;
+    text-shadow: 5px 5px 0 rgba(0, 0, 0, 0.25);
+  }
+  .wordmark {
+    font-family: "Geologica", sans-serif; font-weight: 900; font-size: 96px;
+    letter-spacing: -0.02em; line-height: 1; color: #fff;
+  }
+  .lead { font-size: 30px; font-weight: 600; color: #FFA3CC; margin-top: 16px; }
+  .chips { display: flex; gap: 12px; margin-top: 40px; }
+  .chip {
+    background: rgba(255, 255, 255, 0.1); border: 2px solid rgba(255, 255, 255, 0.28);
+    font-weight: 600; font-size: 22px; padding: 10px 18px; border-radius: 10px; white-space: nowrap;
+  }
+  .chip b { color: #38CCFF; font-weight: 700; }
+
+  .sticker {
+    position: absolute; right: 120px; top: 170px; width: 470px; height: 470px;
+    background: #fff; border-radius: 30px; padding: 18px; transform: rotate(4deg);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+  }
+  .sticker .img {
+    width: 100%; height: 100%; border-radius: 20px;
+    background: url("../public/hedgerow-3d-cad-icon.jpg") center / 112% no-repeat #0e1c31;
+  }
+  .tag {
+    position: absolute; right: 90px; top: 640px; transform: rotate(4deg);
+    background: #FF5E64; color: #fff; font-family: "Geologica", sans-serif; font-weight: 900;
+    font-size: 36px; padding: 12px 28px; border-radius: 999px; box-shadow: 0 12px 26px rgba(0,0,0,0.3);
+  }
+  .foot {
+    position: absolute; left: 110px; bottom: 64px; font-size: 22px; font-weight: 600;
+    color: rgba(255, 255, 255, 0.75); letter-spacing: 0.04em;
+  }
+  .foot span { color: #38CCFF; }
+  .ca {
+    margin-top: 34px; display: inline-flex; align-items: center; gap: 16px;
+    background: rgba(0, 0, 0, 0.28); border: 2px solid rgba(56, 204, 255, 0.5);
+    border-radius: 14px; padding: 14px 20px;
+  }
+  .ca .k { background: #FAD869; color: #003b54; font-weight: 700; font-size: 22px; padding: 4px 12px; border-radius: 8px; }
+  .ca .v { font-family: Consolas, "Courier New", monospace; font-size: 25px; color: #fff; letter-spacing: 0.01em; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="glow sky"></div>
+    <div class="glow coral"></div>
+
+    <div class="copy">
+      <span class="eyebrow">Robinhood Chain</span>
+      <div class="soon">$WEALD is live</div>
+      <div class="wordmark">hedgerow</div>
+      <div class="lead">One ETH deposit. A basket of tokenized stocks.</div>
+      <div class="chips">
+        <span class="chip"><b>NVDA</b> &middot; <b>META</b> &middot; <b>AAPL</b> &middot; <b>TSLA</b></span>
+        <span class="chip">Chainlink-priced</span>
+        <span class="chip">Withdraw any time</span>
+      </div>
+      <div class="ca"><span class="k">CA</span><span class="v">0x6a725216978E452a733aBc2dcDBb69C6575468c1</span></div>
+    </div>
+
+    <div class="sticker"><div class="img"></div></div>
+    <div class="tag">hedgerow.click</div>
+
+    <div class="foot">Open-source vaults on Robinhood Chain <span>&middot;</span> @Hedgerowft</div>
+  </div>
+</body>
+</html>
