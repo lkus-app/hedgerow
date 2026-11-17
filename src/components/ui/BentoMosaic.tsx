@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
+import { CadIcon } from "./CadIcon";
 
 export const BentoMosaic: React.FC = () => {
   const [copiedChain, setCopiedChain] = useState(false);
@@ -24,7 +25,7 @@ export const BentoMosaic: React.FC = () => {
           <span className="font-mono text-xs font-black uppercase bg-navy text-white px-2 py-0.5 rounded-tag">
             Chain ID 4663
           </span>
-          <span className="text-xl group-hover:rotate-12 transition-transform">⚡</span>
+          <CadIcon name="gas" size="sm" blueprintBg className="group-hover:rotate-6 transition-transform" />
         </div>
         <div>
           <div className="text-xs font-bold uppercase tracking-wider text-navy/70">
@@ -79,7 +80,7 @@ export const BentoMosaic: React.FC = () => {
             <span className="text-xs font-mono font-black uppercase tracking-wider bg-navy text-white px-2 py-0.5 rounded-tag">
               Radar
             </span>
-            <span className="w-2.5 h-2.5 rounded-full bg-coral animate-ping" />
+            <CadIcon name="gauge" size="xs" blueprintBg />
           </div>
           <h5 className="font-sans font-extrabold text-lg sm:text-xl text-navy">
             128-Hour Dark Market
@@ -119,7 +120,7 @@ export const BentoMosaic: React.FC = () => {
           <span className="text-xs font-mono font-bold text-pink uppercase bg-white/10 px-2 py-0.5 rounded-tag">
             Reverse PFOF
           </span>
-          <span className="text-2xl animate-bounce">🪙</span>
+          <CadIcon name="mev" size="sm" blueprintBg className="animate-bounce" />
         </div>
         <div>
           <div className="text-xs text-white/70">MEV Recycled to Retail</div>
@@ -141,7 +142,7 @@ export const BentoMosaic: React.FC = () => {
           <span className="text-xs font-mono font-black uppercase text-coral bg-white px-2 py-0.5 rounded-tag shadow-sm">
             OG Asset
           </span>
-          <span className="text-xl">👑</span>
+          <CadIcon name="bow" size="xs" blueprintBg />
         </div>
         <div>
           <div className="font-script text-2xl sm:text-3xl text-coral tracking-wide">
@@ -169,8 +170,8 @@ export const BentoMosaic: React.FC = () => {
             Arbitrum Orbit settlement + Ethereum Blob DA security.
           </p>
         </div>
-        <div className="text-4xl sm:text-5xl animate-wiggle">
-          🥧✨
+        <div className="flex-shrink-0 ml-4">
+          <CadIcon name="rocket" size="lg" blueprintBg className="animate-wiggle" />
         </div>
       </motion.div>
     </div>

@@ -3,6 +3,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Tag } from "./Tag";
+import { CadIcon } from "./CadIcon";
 
 export interface CaseStudyItem {
   eyebrow: string;
@@ -75,10 +76,10 @@ export const CaseStudy: React.FC<CaseStudyProps> = ({
           </div>
 
           {/* Interactive Graphic / Chart Preview */}
-          <div className="h-[200px] sm:h-[220px] rounded-tile bg-bg flex flex-col justify-center items-center p-4 relative overflow-hidden group">
+          <div className="h-[210px] sm:h-[230px] rounded-tile bg-bg flex flex-col justify-center items-center p-4 relative overflow-hidden group">
             {item.illustrationType === "squeeze" && (
               <div className="w-full flex flex-col items-center justify-center">
-                <div className="text-4xl sm:text-5xl mb-2 animate-bounce">🏹 🚀</div>
+                <CadIcon name="rocket" size={88} blueprintBg className="mb-2 shadow-lift hover:scale-105 transition-transform" />
                 <div className="font-display font-extrabold text-navy text-xl sm:text-2xl text-center">
                   +382.4% Gamma Spike
                 </div>
@@ -89,7 +90,7 @@ export const CaseStudy: React.FC<CaseStudyProps> = ({
             )}
             {item.illustrationType === "straddle" && (
               <div className="w-full flex flex-col items-center justify-center">
-                <div className="text-4xl sm:text-5xl mb-2 animate-pulse">🥧 ⚡</div>
+                <CadIcon name="gauge" size={88} blueprintBg className="mb-2 shadow-lift hover:scale-105 transition-transform" />
                 <div className="font-display font-extrabold text-navy text-xl sm:text-2xl text-center">
                   Post-Earnings Straddle
                 </div>
@@ -100,7 +101,7 @@ export const CaseStudy: React.FC<CaseStudyProps> = ({
             )}
             {item.illustrationType === "sentinel" && (
               <div className="w-full flex flex-col items-center justify-center">
-                <div className="text-4xl sm:text-5xl mb-2 animate-float">🤖 🌲</div>
+                <CadIcon name="sentinel" size={88} blueprintBg className="mb-2 shadow-lift hover:scale-105 transition-transform" />
                 <div className="font-display font-extrabold text-navy text-xl sm:text-2xl text-center">
                   Friar-1 AI Sentinel
                 </div>
@@ -111,7 +112,7 @@ export const CaseStudy: React.FC<CaseStudyProps> = ({
             )}
             {item.illustrationType === "arbitrage" && (
               <div className="w-full flex flex-col items-center justify-center">
-                <div className="text-4xl sm:text-5xl mb-2 animate-spin-around">🪙 🥐</div>
+                <CadIcon name="mev" size={88} blueprintBg className="mb-2 shadow-lift hover:scale-105 transition-transform" />
                 <div className="font-display font-extrabold text-navy text-xl sm:text-2xl text-center">
                   24/7 RWA Liquidity Ambush
                 </div>

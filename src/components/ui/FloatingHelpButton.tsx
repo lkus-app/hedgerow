@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { CadIcon } from "./CadIcon";
 
 interface FloatingHelpButtonProps {
   onOpenApp?: () => void;
@@ -23,8 +24,9 @@ export const FloatingHelpButton: React.FC<FloatingHelpButtonProps> = ({
             className="absolute bottom-20 right-0 w-[300px] bg-white rounded-card p-5 shadow-lift border-2 border-lavender text-navy"
           >
             <div className="flex items-center justify-between pb-3 border-b border-lavender">
-              <span className="font-display font-extrabold text-sm text-navy flex items-center gap-1.5">
-                <span>🌲</span> Friar Assistant
+              <span className="font-display font-extrabold text-sm text-navy flex items-center gap-2">
+                <CadIcon name="sentinel" size="xs" blueprintBg />
+                <span>Friar AI Assistant</span>
               </span>
               <button
                 onClick={() => setIsOpen(false)}
@@ -53,9 +55,9 @@ export const FloatingHelpButton: React.FC<FloatingHelpButtonProps> = ({
       <button
         onClick={() => setIsOpen(!isOpen)}
         aria-label="Help & Assistant"
-        className="w-[64px] h-[64px] bg-sky hover:bg-sky/90 rounded-tile flex items-center justify-center text-3xl shadow-soft hover:shadow-lift transition-all duration-300 group hover:animate-wiggle cursor-pointer select-none border-2 border-white/60"
+        className="w-[64px] h-[64px] bg-sky hover:bg-sky/90 rounded-tile flex items-center justify-center p-2 shadow-soft hover:shadow-lift transition-all duration-300 group hover:animate-wiggle cursor-pointer select-none border-2 border-white/60 overflow-hidden"
       >
-        <span className="transform transition-transform group-hover:scale-110">☝️</span>
+        <CadIcon name="actuator" size="md" className="transform transition-transform group-hover:scale-110" />
       </button>
     </div>
   );

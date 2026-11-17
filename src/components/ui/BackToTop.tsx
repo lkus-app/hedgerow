@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { CadIcon } from "./CadIcon";
 
 export const BackToTop: React.FC = () => {
   const scrollToTop = () => {
@@ -14,10 +15,10 @@ export const BackToTop: React.FC = () => {
     <button
       onClick={scrollToTop}
       aria-label="Back to top"
-      className="w-10 h-10 bg-white hover:bg-butter rounded-tag flex items-center justify-center text-xl shadow-soft hover:shadow-lift transition-all duration-200 cursor-pointer"
-      title="Back to the Greenwood"
+      className="w-11 h-11 bg-white hover:bg-butter p-1 rounded-tag flex items-center justify-center shadow-soft hover:shadow-lift transition-all duration-200 cursor-pointer overflow-hidden border border-lavender"
+      title="Back to Top · 3D CAD Blueprint"
     >
-      🥐
+      <CadIcon name="bow" size="sm" />
     </button>
   );
 };

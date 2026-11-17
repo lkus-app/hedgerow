@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
+import { CadIcon, CadIconName } from "./CadIcon";
 
 interface AmbushModalProps {
   isOpen: boolean;
@@ -15,11 +16,11 @@ export const AmbushModal: React.FC<AmbushModalProps> = ({ isOpen, onClose }) => 
   const [isSuccess, setIsSuccess] = useState(false);
   const [isDeploying, setIsDeploying] = useState(false);
 
-  const vaults = [
-    { id: "GME", name: "$GME-RWA Sunday Squeeze", apy: "+64.2% APY", risk: "Wild", icon: "🚀" },
-    { id: "NVDA", name: "$NVDA-RWA Dark Hours Straddle", apy: "+38.5% APY", risk: "Medium", icon: "⚡" },
-    { id: "TSLA", name: "$TSLA-RWA Gamma Ladder", apy: "+48.9% APY", risk: "High", icon: "🔋" },
-    { id: "WEALD", name: "$WEALD Genesis Staking (OG)", apy: "+124.0% APY", risk: "OG Safe", icon: "👑" },
+  const vaults: { id: string; name: string; apy: string; risk: string; cadIcon: CadIconName }[] = [
+    { id: "GME", name: "$GME-RWA Sunday Squeeze", apy: "+64.2% APY", risk: "Wild", cadIcon: "rocket" },
+    { id: "NVDA", name: "$NVDA-RWA Dark Hours Straddle", apy: "+38.5% APY", risk: "Medium", cadIcon: "gauge" },
+    { id: "TSLA", name: "$TSLA-RWA Gamma Ladder", apy: "+48.9% APY", risk: "High", cadIcon: "gas" },
+    { id: "WEALD", name: "$WEALD Genesis Staking (OG)", apy: "+124.0% APY", risk: "OG Safe", cadIcon: "bow" },
   ];
 
   const handleDeposit = () => {
@@ -63,8 +64,8 @@ export const AmbushModal: React.FC<AmbushModalProps> = ({ isOpen, onClose }) => 
           >
             {/* Header */}
             <div className="flex items-center justify-between pb-4 border-b border-lavender">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">🥐🏹</span>
+              <div className="flex items-center gap-3">
+                <CadIcon name="bow" size="md" blueprintBg />
                 <div>
                   <h3 className="font-display font-extrabold text-xl leading-none text-navy">
                     Hedgerow Vault Ambush
@@ -84,7 +85,7 @@ export const AmbushModal: React.FC<AmbushModalProps> = ({ isOpen, onClose }) => 
 
             {isSuccess ? (
               <div className="py-8 text-center">
-                <div className="text-6xl mb-4 animate-bounce">🎉</div>
+                <CadIcon name="rocket" size={96} blueprintBg className="mb-4 mx-auto animate-bounce shadow-lift" />
                 <h4 className="font-display font-black text-2xl text-navy mb-2">
                   Ambush Order Deployed!
                 </h4>
@@ -123,8 +124,8 @@ export const AmbushModal: React.FC<AmbushModalProps> = ({ isOpen, onClose }) => 
                             : "bg-lavender/40 border-lavender hover:border-pink"
                         }`}
                       >
-                        <div className="flex items-center justify-between text-base">
-                          <span>{vault.icon}</span>
+                        <div className="flex items-center justify-between text-base mb-1">
+                          <CadIcon name={vault.cadIcon} size="xs" blueprintBg />
                           <span className="text-xs font-mono font-extrabold text-coral">
                             {vault.apy}
                           </span>
@@ -171,8 +172,8 @@ export const AmbushModal: React.FC<AmbushModalProps> = ({ isOpen, onClose }) => 
                 </div>
 
                 {/* Info block */}
-                <div className="p-3 bg-blush rounded-tile flex items-start gap-2.5 text-xs text-charcoal">
-                  <span className="text-base leading-none">💡</span>
+                <div className="p-3 bg-blush rounded-tile flex items-start gap-3 text-xs text-charcoal">
+                  <CadIcon name="gas" size="xs" blueprintBg className="flex-shrink-0 mt-0.5" />
                   <div>
                     <strong className="text-navy">Automated Off-Hours Execution:</strong>{" "}
                     When TradFi short interest spikes on weekend or after-hours prints, the Friar AI

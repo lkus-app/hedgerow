@@ -15,6 +15,7 @@ import { ScrollIndicator } from "@/components/ui/ScrollIndicator";
 import { BackToTop } from "@/components/ui/BackToTop";
 import { InsetSection } from "@/components/ui/InsetSection";
 import { AmbushModal } from "@/components/ui/AmbushModal";
+import { CadIcon } from "@/components/ui/CadIcon";
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -76,7 +77,7 @@ export default function Home() {
       title: "Why Robinhood Chain is the Trojan Horse for Decentralized Retail Vengeance",
       readTime: "4 min read",
       color: "coral",
-      emoji: "🏹",
+      cadIcon: "bow",
     },
     {
       category: "Mechanics",
@@ -84,7 +85,7 @@ export default function Home() {
       title: "Baking the Math: How Reverse-PFOF Steals the Spread from Market Makers",
       readTime: "6 min read",
       color: "butter",
-      emoji: "🥐",
+      cadIcon: "mev",
     },
     {
       category: "Architecture",
@@ -92,7 +93,7 @@ export default function Home() {
       title: "Arbitrum Orbit + Ethereum Blobs: The Sub-Second Settlement Engine (ID 4663)",
       readTime: "5 min read",
       color: "sky",
-      emoji: "⚡",
+      cadIcon: "gas",
     },
     {
       category: "Manifesto",
@@ -100,7 +101,7 @@ export default function Home() {
       title: "We Don't Do Catering: Codifying WallStreetBets as an Immutable Financial Weapon",
       readTime: "3 min read",
       color: "pink",
-      emoji: "👑",
+      cadIcon: "sentinel",
     },
   ];
 
@@ -127,8 +128,8 @@ export default function Home() {
             className="fixed inset-0 z-50 bg-sky p-8 flex flex-col justify-between"
           >
             <div className="flex items-center justify-between pb-6 border-b border-navy/20">
-              <div className="flex items-center gap-2">
-                <span className="text-3xl">🥐🏹</span>
+              <div className="flex items-center gap-3">
+                <CadIcon name="bow" size="md" blueprintBg />
                 <span className="font-display font-black text-2xl text-navy">hedgerow</span>
               </div>
               <button

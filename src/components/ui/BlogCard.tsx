@@ -2,6 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
+import { CadIcon, CadIconName } from "./CadIcon";
 
 export interface BlogPost {
   category: string;
@@ -9,7 +10,7 @@ export interface BlogPost {
   title: string;
   readTime: string;
   color: "sky" | "coral" | "butter" | "pink";
-  emoji: string;
+  cadIcon: CadIconName;
 }
 
 interface BlogCardProps {
@@ -32,13 +33,16 @@ export const BlogCard: React.FC<BlogCardProps> = ({ post, onClick }) => {
       onClick={onClick}
       className="group relative flex flex-col bg-white rounded-card overflow-hidden shadow-soft hover:shadow-lift border border-lavender cursor-pointer"
     >
-      {/* Tall rounded image placeholder with sticker vibe */}
+      {/* Tall rounded image placeholder with 3D CAD icon */}
       <div
-        className={`relative h-[190px] w-full ${bgColors[post.color]} flex items-center justify-center border-b transition-colors`}
+        className={`relative h-[190px] w-full ${bgColors[post.color]} flex items-center justify-center border-b transition-colors overflow-hidden`}
       >
-        <span className="text-5xl group-hover:scale-110 transition-transform duration-300">
-          {post.emoji}
-        </span>
+        <CadIcon
+          name={post.cadIcon}
+          size={110}
+          blueprintBg
+          className="group-hover:scale-110 group-hover:rotate-2 transition-transform duration-300 shadow-lift"
+        />
 
         {/* Category tag overlapping top */}
         <div className="absolute top-3 left-3 bg-white text-navy font-sans font-bold text-xs uppercase px-2.5 py-1 rounded-tag shadow-sm tracking-wide">
