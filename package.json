@@ -12,7 +12,10 @@
     "chain:local": "hardhat node",
     "deploy:local": "hardhat run scripts/deploy.cjs --network localhost",
     "deploy:testnet": "hardhat run scripts/deploy.cjs --network robinhoodTestnet",
-    "deploy:mainnet": "hardhat run scripts/deploy.cjs --network robinhood"
+    "deploy:mainnet": "hardhat run scripts/deploy.cjs --network robinhood",
+    "deploy:basket:local": "hardhat run scripts/deploy-basket-local.cjs --network localhost",
+    "deploy:basket:testnet": "hardhat run scripts/deploy-basket.cjs --network robinhoodTestnet",
+    "keeper:basket": "hardhat run scripts/basket-keeper.cjs"
   },
   "dependencies": {
     "canvas-confetti": "^1.9.3",

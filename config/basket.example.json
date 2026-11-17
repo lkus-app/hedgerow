@@ -1,0 +1,39 @@
+{
+  "_readme": "Copy to basket.<chainId>.json (46630 = Robinhood Chain Testnet) and replace every placeholder with a real address from docs.robinhood.com/chain, data.chain.link and Uniswap's deployment list. The deploy script checks each address on-chain and refuses to deploy if anything is missing or wrong.",
+  "name": "Hedgerow Equity Basket",
+  "symbol": "hBASKET",
+  "weth": "WETH_ADDRESS",
+  "router": "UNISWAP_V3_SWAPROUTER02_ADDRESS",
+  "ethUsdFeed": "CHAINLINK_ETH_USD_FEED",
+  "ethMaxStaleness": 3600,
+  "maxSlippageBps": 100,
+  "driftBps": 200,
+  "rebalanceCooldown": 3600,
+  "components": [
+    {
+      "label": "TSLA",
+      "token": "TSLA_STOCK_TOKEN_ADDRESS",
+      "feed": "CHAINLINK_TSLA_USD_FEED",
+      "weightBps": 4000,
+      "maxStaleness": 90000,
+      "poolFee": 3000,
+      "_optional_two_hop": "add \"via\": <USDC address> and \"viaFee\": 500 if there is no direct WETH pool"
+    },
+    {
+      "label": "NVDA",
+      "token": "NVDA_STOCK_TOKEN_ADDRESS",
+      "feed": "CHAINLINK_NVDA_USD_FEED",
+      "weightBps": 3000,
+      "maxStaleness": 90000,
+      "poolFee": 3000
+    },
+    {
+      "label": "AMZN",
+      "token": "AMZN_STOCK_TOKEN_ADDRESS",
+      "feed": "CHAINLINK_AMZN_USD_FEED",
+      "weightBps": 3000,
+      "maxStaleness": 90000,
+      "poolFee": 3000
+    }
+  ]
+}

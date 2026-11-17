@@ -24,6 +24,8 @@ export interface Strategy {
   risks: string[];
   /** Vault the user can stake into for this strategy, if one exists. */
   vault?: VaultId;
+  /** Backed by the live BasketVault contract (NEXT_PUBLIC_BASKET_VAULT). */
+  basket?: boolean;
   related?: StrategyId[];
 }
 
@@ -248,34 +250,41 @@ export const strategies: Record<StrategyId, Strategy> = {
 
   baskets: {
     id: "baskets",
-    badge: "RWA Vault",
+    badge: "RWA Vault · BasketVault.sol",
     title: "Tokenized Equity Baskets",
     cadIcon: "actuator",
     tagline:
-      "One deposit buys a weighted basket of tokenized stocks, short-term treasuries and ETH, rebalanced around the clock.",
+      "One ETH deposit owns a slice of a fixed, weighted basket of tokenized stocks. Prices come from Chainlink, trades go through Uniswap, and anyone can trigger the rebalance.",
     mechanism: [
       {
-        title: "Fixed target weights",
-        body: "For example 50% tokenized tech stocks, 30% tokenized T-bills, 20% ETH.",
+        title: "Deposit ETH, get shares priced at NAV",
+        body: "Your ETH is valued with the Chainlink ETH/USD feed and you receive shares in proportion to the basket's current USD value. The ETH is held as WETH until the next rebalance.",
       },
       {
-        title: "Rebalance on drift",
-        body: "When any slice drifts more than a few percent from its target, the vault trades it back. Because tokens trade 24/7, this can happen on weekends too.",
+        title: "Rebalance back to target weights",
+        body: "When any slice drifts more than the drift band from its target (or idle ETH builds up), anyone can call rebalance(). It sells overweight tokens into WETH on Uniswap, then buys underweight ones.",
       },
       {
-        title: "Compound the income",
-        body: "T-bill yield and any staking rewards are reinvested into the basket.",
+        title: "Oracle-bounded swaps",
+        body: "Every swap's minimum output is set from the Chainlink price minus the slippage limit (max 5%, set at 1%). A swap that would fill worse reverts, so a caller cannot route value out of the vault.",
+      },
+      {
+        title: "Withdraw in kind, any time",
+        body: "Burning shares sends you your exact pro-rata amount of every basket token plus ETH. No swap and no oracle are involved, so it works even when markets are closed or prices are stale.",
       },
     ],
     params: [
-      { label: "Mix", value: "Stocks · T-bills · ETH" },
-      { label: "Rebalance", value: "On drift, 24/7" },
-      { label: "Income", value: "Auto-compounded" },
+      { label: "Pricing", value: "Chainlink feeds" },
+      { label: "Trades", value: "Uniswap, oracle-bounded" },
+      { label: "Withdraw", value: "In kind, any time" },
     ],
     risks: [
-      "You carry the market risk of every asset in the basket.",
-      "Tokenized assets rely on the issuer holding the real asset.",
+      "You carry the market risk of every token in the basket.",
+      "Stock tokens are issued by Robinhood and depend on the issuer holding the real asset.",
+      "If a price feed stops updating (e.g. markets closed), deposits and rebalances pause until it updates.",
+      "The contract has tests but no external audit yet.",
     ],
+    basket: true,
     related: ["darkHours", "overview"],
   },
 
@@ -296,13 +305,17 @@ export const strategies: Record<StrategyId, Strategy> = {
         body: "Registry of targets (ticker, trigger APR, vault). The sentinel calls executeAmbushSweep() to record that a strategy fired.",
       },
       {
+        title: "BasketVault.sol",
+        body: "The Equity Basket: ETH in, a weighted basket of stock tokens held on-chain, Chainlink pricing, Uniswap rebalancing anyone can trigger, and in-kind withdrawals.",
+      },
+      {
         title: "Sentinel role",
         body: "The only address that can pay profit into a vault. It can never move user deposits out.",
       },
     ],
     params: [
       { label: "Live vaults", value: "GME · TSLA · NVDA · WEALD" },
-      { label: "Concepts", value: "Sentinel · Reverse-PFOF · Baskets" },
+      { label: "Concepts", value: "Sentinel · Reverse-PFOF" },
       { label: "Withdraw", value: "Any time" },
     ],
     risks: [
@@ -380,3 +393,119 @@ export const articles: Article[] = [
     related: "weald",
   },
 ];
+
+export type PageId = "about" | "mechanics" | "governance" | "contact";
+
+export interface InfoPage {
+  id: PageId;
+  badge: string;
+  title: string;
+  cadIcon: CadIconName;
+  intro: string;
+  sections: { title: string; body: string; code?: string }[];
+}
+
+export const pages: Record<PageId, InfoPage> = {
+  about: {
+    id: "about",
+    badge: "About us",
+    title: "What Hedgerow is",
+    cadIcon: "bow",
+    intro:
+      "Hedgerow is a set of open-source vault contracts on Robinhood Chain that pool ETH from retail stakers and pay out profit from strategies that run while traditional markets are closed.",
+    sections: [
+      {
+        title: "Why Robinhood Chain",
+        body: "Robinhood Chain is an Arbitrum Orbit L2 with tokenized equities that trade 24/7. The traditional stock market still closes at night and on weekends, so prices, borrow fees and spreads behave differently in those hours. That gap is what the strategies target.",
+      },
+      {
+        title: "What is live",
+        body: "Four ETH vaults (GME, TSLA, NVDA, WEALD), the AmbushController that registers targets and records sweeps, and the $WEALD token. You can deposit and withdraw from any deployed vault through this site with your own wallet.",
+      },
+      {
+        title: "What is not live yet",
+        body: "Friar AI Sentinels and Reverse-PFOF are designs without contracts. Equity Baskets has a real contract (BasketVault) that holds the stock tokens itself. Strategy profit for the live vaults is paid in by the sentinel key; the trading itself is not enforced on-chain.",
+      },
+      {
+        title: "Audits",
+        body: "The contracts have Hardhat tests but have not had an external security audit. Only deposit what you can afford to lose.",
+      },
+    ],
+  },
+
+  mechanics: {
+    id: "mechanics",
+    badge: "Mechanics",
+    title: "How the vault math works",
+    cadIcon: "gauge",
+    intro:
+      "Every vault uses the same HedgerowVault contract. Your stake is tracked in shares, and the value of one share only goes up when profit is paid in.",
+    sections: [
+      {
+        title: "1. Deposit",
+        body: "You send ETH and receive shares. The first deposit is 1 share per 1 ETH; after that, shares are priced at the vault's current share value.",
+        code: "shares = assets × totalSupply ÷ totalAssets",
+      },
+      {
+        title: "2. Profit",
+        body: "When a strategy makes money, the sentinel calls recordAmbushProfit() and sends that ETH into the vault. totalAssets rises while totalSupply stays the same, so every share is worth more.",
+        code: "totalAssets += profit",
+      },
+      {
+        title: "3. Withdraw",
+        body: "Burn any number of your shares at any time and receive their current value in ETH. There is no lock-up and no withdrawal fee.",
+        code: "assets = shares × totalAssets ÷ totalSupply",
+      },
+      {
+        title: "Example",
+        body: "You deposit 1 ETH into an empty vault and get 1 share. The sentinel pays in 0.1 ETH of profit. Your 1 share is now worth 1.1 ETH, which you can withdraw.",
+      },
+      {
+        title: "Safety checks",
+        body: "Deposits and withdrawals are reentrancy-guarded, plain ETH sent to a vault without deposit() is rejected, and no role can move user deposits out of a vault.",
+      },
+    ],
+  },
+
+  governance: {
+    id: "governance",
+    badge: "Governance",
+    title: "Who controls what",
+    cadIcon: "sentinel",
+    intro:
+      "Governance today is a single owner key plus a sentinel key. There is no on-chain voting yet. This page lists exactly what each key can and cannot do.",
+    sections: [
+      {
+        title: "Owner (deployer)",
+        body: "Can change the sentinel address, register strategy targets in AmbushController, set which controller may mint $WEALD, and mint $WEALD up to the cap. Cannot withdraw user deposits or change share balances.",
+      },
+      {
+        title: "Sentinel",
+        body: "Can call executeAmbushSweep() and recordAmbushProfit(), which can only add ETH to a vault. Cannot withdraw or move user funds.",
+      },
+      {
+        title: "$WEALD token",
+        body: "Supply starts at 0 with a hard cap of 100,000,000 WEALD. New tokens are minted by the controller each time a sweep is recorded, and the owner can also mint directly, always within the cap. The controller and owner can mark addresses as OG members.",
+      },
+      {
+        title: "Roadmap",
+        body: "Move owner powers to a multisig, then to $WEALD holder voting with a timelock so any change is visible on-chain before it takes effect.",
+      },
+    ],
+  },
+
+  contact: {
+    id: "contact",
+    badge: "Contact",
+    title: "Get in touch",
+    cadIcon: "actuator",
+    intro:
+      "Follow announcements on X, verify every contract address on the explorer, and never trust an address you were sent in a DM.",
+    sections: [
+      {
+        title: "Verify before you send",
+        body: "The only contract addresses to trust are the ones listed here and on the official website. Hedgerow will never DM you first or ask for your seed phrase.",
+      },
+    ],
+  },
+};

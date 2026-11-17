@@ -36,3 +36,4 @@ next-env.d.ts
 # hardhat
 .hardhat/
 deployments/31337.json
+deployments/basket-31337.json

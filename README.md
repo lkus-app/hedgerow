@@ -122,6 +122,31 @@ Copy `.env.example` to `.env.local` and fill in the vault addresses printed by t
 
 ---
 
+## 🧺 Equity Basket (BasketVault.sol)
+
+A real, non-custodial index vault: deposit ETH, own a pro-rata slice of a weighted basket of tokenized stocks.
+
+- **Pricing:** Chainlink feeds (ETH/USD plus one per stock token), with a staleness limit per feed.
+- **Rebalancing:** `rebalance()` is permissionless. It sells overweight tokens into WETH and buys underweight ones on Uniswap (SwapRouter02 `exactInput`). Every swap's minimum output comes from the oracle price minus `maxSlippageBps` (hard cap 5%).
+- **Withdrawals:** paid in kind (each token plus ETH). No swap or oracle is involved, so withdrawals work even when feeds are stale.
+- **Owner powers:** pause deposits and tune slippage, drift and cooldown within caps. The owner cannot move funds. Tokens, weights, feeds and swap paths are fixed at deployment.
+
+```bash
+pnpm contracts:test                    # includes test/basket.test.cjs
+pnpm deploy:basket:local               # local chain, mock tokens/feeds/router -> NEXT_PUBLIC_BASKET_VAULT
+
+# Robinhood Chain Testnet: fill in real addresses first; the script verifies each one on-chain
+cp config/basket.example.json config/basket.46630.json
+DEPLOYER_PRIVATE_KEY=0x... pnpm deploy:basket:testnet
+
+# Optional keeper (any key works, it only pays gas)
+BASKET_VAULT=0x... DEPLOYER_PRIVATE_KEY=0x... pnpm keeper:basket --network robinhoodTestnet
+```
+
+The basket is not externally audited. Mock contracts in `contracts/mocks/` are for local tests only.
+
+---
+
 ## 🛡️ Network Parameters (Robinhood Chain)
 
 | Parameter | Mainnet | Testnet |

@@ -3,16 +3,30 @@
 import React, { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CadIcon } from "./CadIcon";
-import { vaultAddresses, targetChain, type VaultId } from "@/lib/chain";
+import { BasketPanel } from "./BasketPanel";
+import {
+  basketVaultAddress,
+  explorerAddressUrl,
+  projectLinks,
+  targetChain,
+  vaultAddresses,
+  wealdTokenAddress,
+  type VaultId,
+} from "@/lib/chain";
 import {
   articles,
+  pages,
   strategies,
   CONCEPT_REALITY,
   VAULT_REALITY,
+  type PageId,
   type StrategyId,
 } from "@/lib/strategies";
 
-export type Detail = { kind: "strategy"; id: StrategyId } | { kind: "article"; index: number };
+export type Detail =
+  | { kind: "strategy"; id: StrategyId }
+  | { kind: "article"; index: number }
+  | { kind: "page"; id: PageId };
 
 interface DetailModalProps {
   detail: Detail | null;
@@ -38,7 +52,7 @@ export const DetailModal: React.FC<DetailModalProps> = ({ detail, onClose, onNav
     };
   }, [isOpen, onClose]);
 
-  const key = detail ? `${detail.kind}-${detail.kind === "strategy" ? detail.id : detail.index}` : "none";
+  const key = detail ? `${detail.kind}-${detail.kind === "article" ? detail.index : detail.id}` : "none";
 
   return (
     <AnimatePresence>
@@ -82,6 +96,8 @@ export const DetailModal: React.FC<DetailModalProps> = ({ detail, onClose, onNav
               >
                 {detail.kind === "strategy" ? (
                   <StrategyView id={detail.id} onNavigate={onNavigate} onStake={onStake} />
+                ) : detail.kind === "page" ? (
+                  <PageView id={detail.id} onNavigate={onNavigate} />
                 ) : (
                   <ArticleView index={detail.index} onNavigate={onNavigate} />
                 )}
@@ -174,13 +190,27 @@ const StrategyView: React.FC<{
         </div>
       )}
 
-      {!isOverview && (
-        <div className={`mt-6 rounded-card p-4 text-sm leading-relaxed ${s.vault ? "bg-sky/15" : "bg-butter/30"}`}>
-          <span className="block font-bold mb-1">
-            {s.vault ? "What the contract does today" : "Status: not deployed"}
-          </span>
-          <span className="text-charcoal/85">{s.vault ? VAULT_REALITY : CONCEPT_REALITY}</span>
-        </div>
+      {s.basket ? (
+        basketVaultAddress ? (
+          <BasketPanel />
+        ) : (
+          <div className="mt-6 rounded-card p-4 text-sm leading-relaxed bg-butter/30">
+            <span className="block font-bold mb-1">Status: built, not deployed on {targetChain.name}</span>
+            <span className="text-charcoal/85">
+              The BasketVault contract is written and tested, but no basket has been deployed on this network yet, so
+              there is nothing to deposit into here.
+            </span>
+          </div>
+        )
+      ) : (
+        !isOverview && (
+          <div className={`mt-6 rounded-card p-4 text-sm leading-relaxed ${s.vault ? "bg-sky/15" : "bg-butter/30"}`}>
+            <span className="block font-bold mb-1">
+              {s.vault ? "What the contract does today" : "Status: not deployed"}
+            </span>
+            <span className="text-charcoal/85">{s.vault ? VAULT_REALITY : CONCEPT_REALITY}</span>
+          </div>
+        )
       )}
 
       <div className="mt-6">
@@ -259,5 +289,116 @@ const ArticleView: React.FC<{ index: number; onNavigate: DetailModalProps["onNav
         )}
       </div>
     </article>
+  );
+};
+
+const short = (a: string) => `${a.slice(0, 6)}…${a.slice(-4)}`;
+
+const AddressRow: React.FC<{ label: string; address?: string }> = ({ label, address }) => {
+  const url = address ? explorerAddressUrl(address) : undefined;
+  return (
+    <div className="flex items-center justify-between gap-3 border border-lavender rounded-card px-3 py-2.5 text-sm">
+      <span className="font-bold">{label}</span>
+      {address ? (
+        url ? (
+          <a href={url} target="_blank" rel="noreferrer" className="font-mono text-xs underline decoration-2 underline-offset-2 hover:text-coral">
+            {short(address)} ↗
+          </a>
+        ) : (
+          <span className="font-mono text-xs" title={address}>
+            {short(address)}
+          </span>
+        )
+      ) : (
+        <span className="font-mono text-xs text-charcoal/50">not deployed</span>
+      )}
+    </div>
+  );
+};
+
+const PageView: React.FC<{ id: PageId; onNavigate: DetailModalProps["onNavigate"] }> = ({ id, onNavigate }) => {
+  const p = pages[id];
+  const links = [
+    { label: "X", href: projectLinks.x },
+    { label: "Website ↗", href: projectLinks.website },
+  ];
+  return (
+    <>
+      <div className="flex items-start gap-4 pr-10">
+        <CadIcon name={p.cadIcon} size="lg" blueprintBg className="shrink-0" />
+        <div>
+          <span className="inline-block text-[11px] font-mono font-bold uppercase tracking-wider bg-sky/20 text-navy px-2 py-0.5 rounded-tag mb-1.5">
+            {p.badge}
+          </span>
+          <h3 id="detail-title" className="font-display font-black text-2xl leading-tight">
+            {p.title}
+          </h3>
+        </div>
+      </div>
+      <p className="mt-4 text-[15px] text-charcoal/85 leading-relaxed">{p.intro}</p>
+
+      <div className="mt-6 space-y-5">
+        {p.sections.map((sec) => (
+          <div key={sec.title}>
+            <span className="block font-bold text-[15px] mb-1">{sec.title}</span>
+            <span className="block text-sm text-charcoal/80 leading-relaxed">{sec.body}</span>
+            {sec.code && (
+              <code className="mt-2 inline-block font-mono text-xs bg-lavender rounded-tag px-2.5 py-1.5">{sec.code}</code>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {(id === "contact" || id === "governance") && (
+        <div className="mt-6">
+          <SectionLabel>contracts on {targetChain.name}</SectionLabel>
+          <div className="grid gap-2">
+            <AddressRow label="$WEALD token (CA)" address={wealdTokenAddress} />
+            {(Object.keys(vaultAddresses) as VaultId[]).map((v) => (
+              <AddressRow key={v} label={`${v} vault`} address={vaultAddresses[v]} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {id === "contact" && (
+        <div className="mt-6 grid grid-cols-2 gap-2">
+          {links.map((l) =>
+            l.href ? (
+              <a
+                key={l.label}
+                href={l.href}
+                target="_blank"
+                rel="noreferrer"
+                className="text-center font-bold bg-coral text-white rounded-tile py-3 hover:brightness-95 transition-all"
+              >
+                {l.label}
+              </a>
+            ) : (
+              <span key={l.label} className="text-center font-bold bg-lavender text-charcoal/50 rounded-tile py-3" title="Not configured yet">
+                {l.label}
+              </span>
+            )
+          )}
+        </div>
+      )}
+
+      {id === "about" && (
+        <button
+          onClick={() => onNavigate({ kind: "strategy", id: "overview" })}
+          className="mt-6 text-sm font-bold bg-sky/20 hover:bg-sky/35 px-4 py-2 rounded-tag transition-colors"
+        >
+          see all vaults ›
+        </button>
+      )}
+      {id === "mechanics" && (
+        <button
+          onClick={() => onNavigate({ kind: "page", id: "governance" })}
+          className="mt-6 text-sm font-bold bg-sky/20 hover:bg-sky/35 px-4 py-2 rounded-tag transition-colors"
+        >
+          who controls the vaults ›
+        </button>
+      )}
+    </>
   );
 };

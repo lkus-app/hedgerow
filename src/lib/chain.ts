@@ -1,4 +1,4 @@
-import { defineChain, type Address, type Chain } from "viem";
+import { defineChain, parseAbi, type Address, type Chain } from "viem";
 
 export const robinhoodTestnet = defineChain({
   id: 46630,
@@ -57,6 +57,20 @@ export const vaultAddresses: Record<VaultId, Address | undefined> = {
   WEALD: asAddress(process.env.NEXT_PUBLIC_VAULT_WEALD),
 };
 
+/** $WEALD token contract address (the "CA"), printed by the deploy script. */
+export const wealdTokenAddress = asAddress(process.env.NEXT_PUBLIC_WEALD_TOKEN);
+
+/** Public project links. Unset links render as disabled buttons rather than placeholders. */
+export const projectLinks = {
+  x: process.env.NEXT_PUBLIC_X_URL || undefined,
+  website: process.env.NEXT_PUBLIC_WEBSITE_URL || undefined,
+};
+
+export const explorerAddressUrl = (address: string) => {
+  const base = targetChain.blockExplorers?.default.url;
+  return base ? `${base}/address/${address}` : undefined;
+};
+
 export const explorerTxUrl = (hash: string) => {
   const base = targetChain.blockExplorers?.default.url;
   return base ? `${base}/tx/${hash}` : undefined;
@@ -111,3 +125,24 @@ export const hedgerowVaultAbi = [
     ],
   },
 ] as const;
+
+/** Equity Basket vault (BasketVault.sol), printed by the basket deploy script. */
+export const basketVaultAddress = asAddress(process.env.NEXT_PUBLIC_BASKET_VAULT);
+
+export const basketVaultAbi = parseAbi([
+  "function composition() view returns (address[] tokens, uint16[] weightsBps, uint256[] balances, uint256[] valuesUsd, uint256 wethBalance, uint256 wethValueUsd, uint256 navUsd, bool pricesFresh)",
+  "function totalSupply() view returns (uint256)",
+  "function balanceOf(address) view returns (uint256)",
+  "function previewDeposit(uint256 ethAmount) view returns (uint256)",
+  "function needsRebalance() view returns (bool)",
+  "function depositsPaused() view returns (bool)",
+  "function maxSlippageBps() view returns (uint16)",
+  "function deposit(uint256 minShares) payable returns (uint256)",
+  "function withdraw(uint256 shares) returns (uint256)",
+  "function rebalance()",
+]);
+
+export const erc20MetaAbi = parseAbi([
+  "function symbol() view returns (string)",
+  "function decimals() view returns (uint8)",
+]);

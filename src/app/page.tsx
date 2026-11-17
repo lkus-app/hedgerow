@@ -16,6 +16,7 @@ import { BackToTop } from "@/components/ui/BackToTop";
 import { InsetSection } from "@/components/ui/InsetSection";
 import { AmbushModal } from "@/components/ui/AmbushModal";
 import { CadIcon } from "@/components/ui/CadIcon";
+import { ProjectLinks } from "@/components/ui/ProjectLinks";
 import { DetailModal, type Detail } from "@/components/ui/DetailModal";
 import { articles, type StrategyId } from "@/lib/strategies";
 import type { VaultId } from "@/lib/chain";
@@ -544,32 +545,9 @@ export default function Home() {
                 join the greenwood syndicate. deploy liquidity on robinhood chain before mainnet public gates shut.
               </p>
 
-              <div className="mb-6">
-                <span className="text-xs font-mono font-bold uppercase tracking-wider text-butter block mb-1">
-                  Direct Dispatch
-                </span>
-                <a
-                  href="mailto:outlaws@hedgerow.fi"
-                  className="font-display font-bold text-2xl text-white hover:text-butter transition-colors underline decoration-2 underline-offset-4"
-                >
-                  outlaws@hedgerow.fi
-                </a>
-              </div>
             </div>
 
-            <div className="space-y-4">
-              {/* Navy CTA ("start an ambush ›") */}
-              <Button
-                variant="navy"
-                fullWidth
-                onClick={handleOpenApp}
-                className="py-4 text-xl"
-              >
-                start an ambush ›
-              </Button>
-
-              <SocialIcons color="white" />
-            </div>
+            <ProjectLinks />
           </div>
 
           {/* Middle/Right: Nav lists */}
@@ -580,14 +558,22 @@ export default function Home() {
                 Directory
               </span>
               <ul className="space-y-3 font-display font-extrabold text-[22px] sm:text-[24px]">
-                {["vaults", "about us", "mechanics", "governance", "contact"].map((item, idx) => (
-                  <li key={idx}>
-                    <a
-                      href={`#${item.replace(/\s+/g, "-")}`}
-                      className="hover:text-butter transition-colors lowercase"
+                {(
+                  [
+                    ["vaults", { kind: "strategy", id: "overview" }],
+                    ["about us", { kind: "page", id: "about" }],
+                    ["mechanics", { kind: "page", id: "mechanics" }],
+                    ["governance", { kind: "page", id: "governance" }],
+                    ["contact", { kind: "page", id: "contact" }],
+                  ] as [string, Detail][]
+                ).map(([label, target]) => (
+                  <li key={label}>
+                    <button
+                      onClick={() => setDetail(target)}
+                      className="hover:text-butter transition-colors lowercase text-left"
                     >
-                      {item}
-                    </a>
+                      {label}
+                    </button>
                   </li>
                 ))}
               </ul>

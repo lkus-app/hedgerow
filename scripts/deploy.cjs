@@ -45,6 +45,7 @@ async function main() {
 
   console.log("\nAdd to .env.local:");
   console.log(`NEXT_PUBLIC_CHAIN_ID=${chainId}`);
+  console.log(`NEXT_PUBLIC_WEALD_TOKEN=${weald.address}`);
   for (const [id, addr] of Object.entries(vaults)) console.log(`NEXT_PUBLIC_VAULT_${id}=${addr}`);
 }
 
