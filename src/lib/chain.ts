@@ -57,8 +57,13 @@ export const vaultAddresses: Record<VaultId, Address | undefined> = {
   WEALD: asAddress(process.env.NEXT_PUBLIC_VAULT_WEALD),
 };
 
-/** $WEALD token contract address (the "CA"), printed by the deploy script. */
-export const wealdTokenAddress = asAddress(process.env.NEXT_PUBLIC_WEALD_TOKEN);
+/** $WEALD token contract address (the "CA") on Robinhood Chain mainnet. NEXT_PUBLIC_WEALD_TOKEN overrides it. */
+export const WEALD_CA: Address = "0x6a725216978E452a733aBc2dcDBb69C6575468c1";
+export const wealdTokenAddress = asAddress(process.env.NEXT_PUBLIC_WEALD_TOKEN) ?? WEALD_CA;
+
+/** The CA lives on mainnet, so its explorer link always points at mainnet Blockscout. */
+export const wealdExplorerUrl = (address: string) =>
+  `${robinhoodMainnet.blockExplorers!.default.url}/address/${address}`;
 
 /** Public project links (env vars override the official defaults). */
 export const projectLinks = {

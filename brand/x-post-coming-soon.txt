@@ -1,0 +1,9 @@
+Something is baking on Robinhood Chain.
+
+Hedgerow: open-source vaults where one ETH deposit holds a basket of tokenized stocks.
+
+NVDA, META, AAPL, TSLA
+Priced by Chainlink
+Withdraw any time
+
+Coming soon. $WEALD

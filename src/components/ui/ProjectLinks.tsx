@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { explorerAddressUrl, projectLinks, wealdTokenAddress } from "@/lib/chain";
+import { projectLinks, wealdExplorerUrl, wealdTokenAddress } from "@/lib/chain";
 
 const base =
   "inline-flex items-center justify-center gap-2 h-12 px-5 rounded-tile font-sans font-bold text-[15px] transition-all select-none";
@@ -51,7 +51,7 @@ export const ProjectLinks: React.FC<{ className?: string; tone?: keyof typeof to
     }
   };
 
-  const caExplorer = ca ? explorerAddressUrl(ca) : undefined;
+  const caExplorer = ca ? wealdExplorerUrl(ca) : undefined;
 
   return (
     <div className={`flex flex-col gap-3 ${className}`}>

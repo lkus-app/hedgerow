@@ -10,6 +10,7 @@ import {
   projectLinks,
   targetChain,
   vaultAddresses,
+  wealdExplorerUrl,
   wealdTokenAddress,
   type VaultId,
 } from "@/lib/chain";
@@ -294,8 +295,8 @@ const ArticleView: React.FC<{ index: number; onNavigate: DetailModalProps["onNav
 
 const short = (a: string) => `${a.slice(0, 6)}…${a.slice(-4)}`;
 
-const AddressRow: React.FC<{ label: string; address?: string }> = ({ label, address }) => {
-  const url = address ? explorerAddressUrl(address) : undefined;
+const AddressRow: React.FC<{ label: string; address?: string; mainnet?: boolean }> = ({ label, address, mainnet }) => {
+  const url = address ? (mainnet ? wealdExplorerUrl(address) : explorerAddressUrl(address)) : undefined;
   return (
     <div className="flex items-center justify-between gap-3 border border-lavender rounded-card px-3 py-2.5 text-sm">
       <span className="font-bold">{label}</span>
@@ -353,7 +354,7 @@ const PageView: React.FC<{ id: PageId; onNavigate: DetailModalProps["onNavigate"
         <div className="mt-6">
           <SectionLabel>contracts on {targetChain.name}</SectionLabel>
           <div className="grid gap-2">
-            <AddressRow label="$WEALD token (CA)" address={wealdTokenAddress} />
+            <AddressRow label="$WEALD token (CA)" address={wealdTokenAddress} mainnet />
             {(Object.keys(vaultAddresses) as VaultId[]).map((v) => (
               <AddressRow key={v} label={`${v} vault`} address={vaultAddresses[v]} />
             ))}
