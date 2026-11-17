@@ -18,6 +18,8 @@ import { publicClient, readableError, useWallet } from "@/lib/useWallet";
 interface AmbushModalProps {
   isOpen: boolean;
   onClose: () => void;
+  /** Vault to preselect each time the modal opens. */
+  initialVault?: VaultId;
 }
 
 type Step =
@@ -47,7 +49,7 @@ const viewVariants = {
   exit: { opacity: 0, y: -12 },
 };
 
-export const AmbushModal: React.FC<AmbushModalProps> = ({ isOpen, onClose }) => {
+export const AmbushModal: React.FC<AmbushModalProps> = ({ isOpen, onClose, initialVault }) => {
   const wallet = useWallet();
   const [selectedVault, setSelectedVault] = useState<VaultId>("GME");
   const [amount, setAmount] = useState("0.01");
@@ -102,6 +104,11 @@ export const AmbushModal: React.FC<AmbushModalProps> = ({ isOpen, onClose }) => 
       setReadError(readableError(e));
     }
   }, [reader, wallet.account, wallet.isOnTargetChain, vaultAddress]);
+
+  useEffect(() => {
+    if (isOpen && initialVault && !busy) setSelectedVault(initialVault);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, initialVault]);
 
   useEffect(() => {
     if (isOpen) refresh();
@@ -194,7 +201,7 @@ export const AmbushModal: React.FC<AmbushModalProps> = ({ isOpen, onClose }) => 
     if (!wallet.hasProvider)
       return { label: "install a wallet to stake ›", onClick: () => window.open("https://metamask.io/download/", "_blank", "noreferrer"), disabled: false };
     if (!wallet.account)
-      return { label: wallet.isConnecting ? "connecting…" : "connect wallet ›", onClick: wallet.connect, disabled: wallet.isConnecting };
+      return { label: wallet.isConnecting ? "approve in your wallet… (click to retry)" : "connect wallet ›", onClick: wallet.connect, disabled: false };
     if (!wallet.isOnTargetChain)
       return { label: `switch to ${targetChain.name} ›`, onClick: wallet.switchToTarget, disabled: false };
     if (!vaultAddress) return { label: "vault not deployed on this network", onClick: () => {}, disabled: true };

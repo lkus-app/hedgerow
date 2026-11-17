@@ -16,13 +16,18 @@ import { BackToTop } from "@/components/ui/BackToTop";
 import { InsetSection } from "@/components/ui/InsetSection";
 import { AmbushModal } from "@/components/ui/AmbushModal";
 import { CadIcon } from "@/components/ui/CadIcon";
+import { DetailModal, type Detail } from "@/components/ui/DetailModal";
+import { articles, type StrategyId } from "@/lib/strategies";
+import type { VaultId } from "@/lib/chain";
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [stakeVault, setStakeVault] = useState<VaultId>();
+  const [detail, setDetail] = useState<Detail | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Case study data
-  const caseStudies: CaseStudyItem[] = [
+  const caseStudies: (CaseStudyItem & { strategy: StrategyId })[] = [
     {
       eyebrow: "Epoch #001 · Robinhood Chain L2",
       title: "The Sunday Squeeze: GameStop ($GME-RWA) Ambush",
@@ -33,6 +38,7 @@ export default function Home() {
       statLabel: "Total Squeeze Profits Recycled",
       statValue: "$2.84M USD",
       illustrationType: "squeeze",
+      strategy: "midnight",
     },
     {
       eyebrow: "Epoch #002 · Dark Hours Engine",
@@ -44,6 +50,7 @@ export default function Home() {
       statLabel: "Arbitrage Spread Harvested",
       statValue: "+$1.15M USDC",
       illustrationType: "straddle",
+      strategy: "darkHours",
     },
     {
       eyebrow: "Epoch #003 · Autonomous Agents",
@@ -55,6 +62,7 @@ export default function Home() {
       statLabel: "Retail Order Flow Protected",
       statValue: "100% MEV Rebated",
       illustrationType: "sentinel",
+      strategy: "sentinel",
     },
     {
       eyebrow: "Epoch #004 · Tokenized Equities",
@@ -66,46 +74,32 @@ export default function Home() {
       statLabel: "Off-Market Volume Settled",
       statValue: "$8.9M 24h Vol",
       illustrationType: "arbitrage",
+      strategy: "gamma",
     },
   ];
 
-  // Blog posts
-  const blogPosts: BlogPost[] = [
-    {
-      category: "Protocol Lore",
-      author: "Friar Tuck",
-      title: "Why Robinhood Chain is the Trojan Horse for Decentralized Retail Vengeance",
-      readTime: "4 min read",
-      color: "coral",
-      cadIcon: "bow",
-    },
-    {
-      category: "Mechanics",
-      author: "Little John",
-      title: "Baking the Math: How Reverse-PFOF Steals the Spread from Market Makers",
-      readTime: "6 min read",
-      color: "butter",
-      cadIcon: "mev",
-    },
-    {
-      category: "Architecture",
-      author: "Will Scarlet",
-      title: "Arbitrum Orbit + Ethereum Blobs: The Sub-Second Settlement Engine (ID 4663)",
-      readTime: "5 min read",
-      color: "sky",
-      cadIcon: "gas",
-    },
-    {
-      category: "Manifesto",
-      author: "The Greenwood Guild",
-      title: "We Don't Do Catering: Codifying WallStreetBets as an Immutable Financial Weapon",
-      readTime: "3 min read",
-      color: "pink",
-      cadIcon: "sentinel",
-    },
-  ];
+  // Blog posts (full text lives in lib/strategies.ts)
+  const blogColors: BlogPost["color"][] = ["coral", "butter", "sky", "pink"];
+  const blogPosts: BlogPost[] = articles.map((a, i) => ({
+    category: a.category,
+    author: a.author,
+    title: a.title,
+    readTime: a.readTime,
+    color: blogColors[i % blogColors.length],
+    cadIcon: a.cadIcon,
+  }));
 
-  const handleOpenApp = () => setIsModalOpen(true);
+  const handleOpenApp = () => {
+    setStakeVault(undefined);
+    setIsModalOpen(true);
+  };
+  const openStake = (vault: VaultId) => {
+    setDetail(null);
+    setStakeVault(vault);
+    setIsModalOpen(true);
+  };
+  const openStrategy = (id: StrategyId) => setDetail({ kind: "strategy", id });
+  const closeDetail = React.useCallback(() => setDetail(null), []);
 
   return (
     <div className="page-inset-wrapper">
@@ -116,7 +110,10 @@ export default function Home() {
       <FloatingHelpButton onOpenApp={handleOpenApp} />
 
       {/* Interactive Vault Ambush Modal */}
-      <AmbushModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <AmbushModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} initialVault={stakeVault} />
+
+      {/* Strategy / article detail sheets */}
+      <DetailModal detail={detail} onClose={closeDetail} onNavigate={setDetail} onStake={openStake} />
 
       {/* Mobile Navigation Drawer */}
       <AnimatePresence>
@@ -364,38 +361,38 @@ export default function Home() {
               badge="Vault #01"
               title="midnight ambush vaults"
               description="captures off-hours short borrow spikes while tradfi equity markets sleep on weekends and overnight sessions."
-              onClick={handleOpenApp}
+              onClick={() => openStrategy("midnight")}
             />
             <ServiceCard
               badge="Vault #02"
               title="asymmetric gamma pies"
               description="automated synthetic call ladders for tokenized equities on robinhood chain with zero theta decay and concentrated liquidity."
-              onClick={handleOpenApp}
+              onClick={() => openStrategy("gamma")}
             />
             <ServiceCard
               badge="Autonomous"
               title="friar ai sentinels"
               description="on-chain AI micro-agents scanning SEC 13F filings, borrow rates, and dark order book imbalances in real-time."
-              onClick={handleOpenApp}
+              onClick={() => openStrategy("sentinel")}
             />
             <ServiceCard
               badge="Yield Engine"
               title="reverse-pfof sprinkles"
               description="extracts MEV from institutional market makers and batches orders, dropping 100% of the arb profits back to stakers."
-              onClick={handleOpenApp}
+              onClick={() => openStrategy("reversePfof")}
             />
             <ServiceCard
               badge="RWA Vault"
               title="tokenized equity baskets"
               description="24/7 compounded yield vaults holding tokenized US stocks, treasuries, and native ETH simultaneously."
-              onClick={handleOpenApp}
+              onClick={() => openStrategy("baskets")}
             />
             <ServiceCard
               isOutline
               badge="All Strategies"
               title="overview of all vaults"
               description="explore the open-source contracts, audited by the Greenwood Guild on Robinhood Chain testnet & mainnet."
-              onClick={handleOpenApp}
+              onClick={() => openStrategy("overview")}
             />
           </div>
         </div>
@@ -419,7 +416,7 @@ export default function Home() {
               key={idx}
               item={item}
               align={idx % 2 === 0 ? "left" : "right"}
-              onInteract={handleOpenApp}
+              onInteract={() => openStrategy(item.strategy)}
             />
           ))}
         </div>
@@ -428,7 +425,7 @@ export default function Home() {
         <div className="mt-12 text-center">
           <Button
             variant="coral"
-            onClick={handleOpenApp}
+            onClick={() => openStrategy("overview")}
             className="w-full sm:w-[380px] py-4 text-xl"
           >
             that’s just a taste ›
@@ -455,18 +452,18 @@ export default function Home() {
         {/* 2-Column Grid of Pill Tiles (--lavender, 8px radius, 75px tall) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
           {[
-            { label: "tokenized tech equities (RWA)", count: "8 pools" },
-            { label: "weekend crypto-tradfi arbitrage", count: "128 hrs/wk" },
-            { label: "high short-interest meme assets", count: "142% apr" },
-            { label: "after-hours earnings announcements", count: "4:00 PM EST" },
-            { label: "overnight treasury yield curve", count: "US-TBill" },
-            { label: "autonomous AI agent order flows", count: "EVM-Native" },
+            { label: "tokenized tech equities (RWA)", count: "8 pools", strategy: "baskets" as StrategyId },
+            { label: "weekend crypto-tradfi arbitrage", count: "128 hrs/wk", strategy: "gamma" as StrategyId },
+            { label: "high short-interest meme assets", count: "142% apr", strategy: "midnight" as StrategyId },
+            { label: "after-hours earnings announcements", count: "4:00 PM EST", strategy: "darkHours" as StrategyId },
+            { label: "overnight treasury yield curve", count: "US-TBill", strategy: "baskets" as StrategyId },
+            { label: "autonomous AI agent order flows", count: "EVM-Native", strategy: "sentinel" as StrategyId },
           ].map((item, idx) => (
             <IndustryTile
               key={idx}
               label={item.label}
               count={item.count}
-              onClick={handleOpenApp}
+              onClick={() => openStrategy(item.strategy)}
             />
           ))}
         </div>
@@ -495,7 +492,7 @@ export default function Home() {
         {/* 4-Column Card Row */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           {blogPosts.map((post, idx) => (
-            <BlogCard key={idx} post={post} onClick={handleOpenApp} />
+            <BlogCard key={idx} post={post} onClick={() => setDetail({ kind: "article", index: idx })} />
           ))}
         </div>
 
@@ -503,7 +500,7 @@ export default function Home() {
         <div className="text-center">
           <Button
             variant="sky"
-            onClick={handleOpenApp}
+            onClick={() => setDetail({ kind: "article", index: 0 })}
             className="w-full sm:w-[280px] py-3.5 text-lg"
           >
             we got more ›
@@ -603,27 +600,27 @@ export default function Home() {
               </h4>
               <ul className="space-y-2.5 font-sans font-normal text-sm sm:text-base text-white/90">
                 <li>
-                  <button onClick={handleOpenApp} className="hover:text-butter transition-colors text-left">
+                  <button onClick={() => openStake("GME")} className="hover:text-butter transition-colors text-left">
                     $GME Sunday Squeeze
                   </button>
                 </li>
                 <li>
-                  <button onClick={handleOpenApp} className="hover:text-butter transition-colors text-left">
+                  <button onClick={() => openStake("NVDA")} className="hover:text-butter transition-colors text-left">
                     $NVDA Dark Hours
                   </button>
                 </li>
                 <li>
-                  <button onClick={handleOpenApp} className="hover:text-butter transition-colors text-left">
+                  <button onClick={() => openStake("TSLA")} className="hover:text-butter transition-colors text-left">
                     $TSLA Gamma Ladder
                   </button>
                 </li>
                 <li>
-                  <button onClick={handleOpenApp} className="hover:text-butter transition-colors text-left">
+                  <button onClick={() => openStake("WEALD")} className="hover:text-butter transition-colors text-left">
                     $WEALD Genesis Staking
                   </button>
                 </li>
                 <li>
-                  <button onClick={handleOpenApp} className="hover:text-butter transition-colors text-left">
+                  <button onClick={() => openStrategy("reversePfof")} className="hover:text-butter transition-colors text-left">
                     Reverse-PFOF Recycler
                   </button>
                 </li>
@@ -667,14 +664,14 @@ export default function Home() {
                   </a>
                 </li>
                 <li>
-                  <button onClick={handleOpenApp} className="hover:text-butter transition-colors text-left">
+                  <button onClick={() => openStrategy("weald")} className="hover:text-butter transition-colors text-left">
                     OG Badge Verification
                   </button>
                 </li>
                 <li>
-                  <button onClick={handleOpenApp} className="hover:text-butter transition-colors text-left">
+                  <a href="/hedgerow-3d-cad-icon.jpg" download className="hover:text-butter transition-colors">
                     Brand Assets &amp; Stickers
-                  </button>
+                  </a>
                 </li>
               </ul>
             </div>

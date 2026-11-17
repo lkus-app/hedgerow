@@ -162,7 +162,7 @@ export const CaseStudy: React.FC<CaseStudyProps> = ({
             onClick={onInteract}
             className="inline-flex items-center gap-1.5 text-navy font-sans font-bold text-sm hover:text-coral transition-colors"
           >
-            inspect vault contracts <span>↗</span>
+            how this strategy works <span>›</span>
           </button>
         )}
       </motion.div>

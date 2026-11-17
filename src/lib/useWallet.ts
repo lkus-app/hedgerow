@@ -35,6 +35,9 @@ export function readableError(e: unknown): string {
     return "You rejected the request in your wallet.";
   }
   if (/insufficient funds/i.test(err?.message ?? "")) return "Not enough ETH to cover the deposit plus gas.";
+  if (err?.code === -32002 || /already pending/i.test(err?.message ?? "")) {
+    return "A connection request is already waiting in your wallet. Open the wallet extension to approve it.";
+  }
   return err?.shortMessage || err?.details || err?.message || "Something went wrong.";
 }
 
