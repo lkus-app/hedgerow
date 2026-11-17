@@ -137,6 +137,7 @@ export const basketVaultAbi = parseAbi([
   "function needsRebalance() view returns (bool)",
   "function depositsPaused() view returns (bool)",
   "function maxSlippageBps() view returns (uint16)",
+  "function depositFeeBps() view returns (uint16)",
   "function deposit(uint256 minShares) payable returns (uint256)",
   "function withdraw(uint256 shares) returns (uint256)",
   "function rebalance()",

@@ -14,6 +14,8 @@ export interface CaseStudyItem {
   statLabel?: string;
   statValue?: string;
   illustrationType: "squeeze" | "straddle" | "sentinel" | "arbitrage";
+  /** True when a contract for this strategy is deployed or ready to deploy. */
+  live?: boolean;
 }
 
 interface CaseStudyProps {
@@ -66,9 +68,13 @@ export const CaseStudy: React.FC<CaseStudyProps> = ({
             <span className="font-mono text-xs font-bold uppercase tracking-wider text-charcoal/70 bg-bg px-2.5 py-1 rounded-tag">
               Robinhood Chain (L2: 4663)
             </span>
-            <span className="flex items-center gap-1.5 text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              Live Epoch
+            <span
+              className={`flex items-center gap-1.5 text-xs font-semibold px-2 py-0.5 rounded-full ${
+                item.live ? "text-emerald-700 bg-emerald-50" : "text-charcoal/70 bg-lavender"
+              }`}
+            >
+              <span className={`w-2 h-2 rounded-full ${item.live ? "bg-emerald-500" : "bg-charcoal/40"}`} />
+              {item.live ? "Contract" : "Concept"}
             </span>
           </div>
 
@@ -78,10 +84,10 @@ export const CaseStudy: React.FC<CaseStudyProps> = ({
               <div className="w-full flex flex-col items-center justify-center">
                 <CadIcon name="rocket" size={88} blueprintBg className="mb-2 shadow-lift hover:scale-105 transition-transform" />
                 <div className="font-display font-extrabold text-navy text-xl sm:text-2xl text-center">
-                  +382.4% Gamma Spike
+                  Weekend Borrow Spikes
                 </div>
                 <div className="text-xs text-charcoal/75 mt-1 font-mono">
-                  Off-Hours Short Borrow: 142% APR Swept
+                  Fri 4:00 PM → Mon 9:30 AM ET
                 </div>
               </div>
             )}
@@ -92,7 +98,7 @@ export const CaseStudy: React.FC<CaseStudyProps> = ({
                   Post-Earnings Straddle
                 </div>
                 <div className="text-xs text-charcoal/75 mt-1 font-mono">
-                  Sunday Midnight Oracle Arbitrage Settled
+                  After-hours earnings, both directions
                 </div>
               </div>
             )}
@@ -100,10 +106,10 @@ export const CaseStudy: React.FC<CaseStudyProps> = ({
               <div className="w-full flex flex-col items-center justify-center">
                 <CadIcon name="sentinel" size={88} blueprintBg className="mb-2 shadow-lift hover:scale-105 transition-transform" />
                 <div className="font-display font-extrabold text-navy text-xl sm:text-2xl text-center">
-                  Friar-1 AI Sentinel
+                  NVDA · META · AAPL · TSLA
                 </div>
                 <div className="text-xs text-charcoal/75 mt-1 font-mono">
-                  Zero Latency • 100% Reverse-PFOF Recycled
+                  40 / 25 / 20 / 15 · Chainlink-priced
                 </div>
               </div>
             )}
@@ -111,10 +117,10 @@ export const CaseStudy: React.FC<CaseStudyProps> = ({
               <div className="w-full flex flex-col items-center justify-center">
                 <CadIcon name="mev" size={88} blueprintBg className="mb-2 shadow-lift hover:scale-105 transition-transform" />
                 <div className="font-display font-extrabold text-navy text-xl sm:text-2xl text-center">
-                  24/7 RWA Liquidity Ambush
+                  Liquidity Ladder
                 </div>
                 <div className="text-xs text-charcoal/75 mt-1 font-mono">
-                  TradFi Gap Captured: +$1.42M MEV Reclaimed
+                  Ranges above spot, no time decay
                 </div>
               </div>
             )}

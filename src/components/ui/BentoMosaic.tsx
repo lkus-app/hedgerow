@@ -1,11 +1,52 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { formatUnits, parseAbi, type Address } from "viem";
 import { CadIcon } from "./CadIcon";
+import { targetChain } from "@/lib/chain";
+import { publicClient } from "@/lib/useWallet";
+
+// Chainlink standard proxies on Robinhood Chain mainnet (docs.chain.link, Robinhood tokenized equities).
+const MAINNET_FEEDS: { ticker: string; feed: Address }[] = [
+  { ticker: "NVDA", feed: "0x379EC4f7C378F34a1B47E4F3cbeBCbAC3E8E9F15" },
+  { ticker: "TSLA", feed: "0x4A1166a659A55625345e9515b32adECea5547C38" },
+  { ticker: "GME", feed: "0x27C71df6A64fB476468EdF256CF72c038baB5B67" },
+];
+const feedAbi = parseAbi([
+  "function decimals() view returns (uint8)",
+  "function latestRoundData() view returns (uint80,int256,uint256,uint256,uint80)",
+]);
+
+/** Live Chainlink prices on mainnet; null when not on mainnet or the read fails. */
+function useLivePrices() {
+  const [prices, setPrices] = useState<Record<string, number | null>>({});
+  useEffect(() => {
+    if (targetChain.id !== 4663) return;
+    let cancelled = false;
+    Promise.all(
+      MAINNET_FEEDS.map(async ({ ticker, feed }) => {
+        try {
+          const [dec, round] = await Promise.all([
+            publicClient.readContract({ address: feed, abi: feedAbi, functionName: "decimals" }),
+            publicClient.readContract({ address: feed, abi: feedAbi, functionName: "latestRoundData" }),
+          ]);
+          return [ticker, Number(formatUnits(round[1], dec))] as const;
+        } catch {
+          return [ticker, null] as const;
+        }
+      })
+    ).then((rows) => !cancelled && setPrices(Object.fromEntries(rows)));
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  return prices;
+}
 
 export const BentoMosaic: React.FC = () => {
   const [copiedChain, setCopiedChain] = useState(false);
+  const prices = useLivePrices();
 
   const handleCopyChainId = () => {
     navigator.clipboard.writeText("4663");
@@ -32,10 +73,10 @@ export const BentoMosaic: React.FC = () => {
             Robinhood Chain L2
           </div>
           <div className="font-display font-extrabold text-2xl sm:text-3xl text-navy leading-none mt-1">
-            0.0001 ETH
+            Arbitrum Orbit
           </div>
           <div className="text-[11px] font-sans text-navy/80 mt-1 font-medium">
-            {copiedChain ? "✓ Copied Chain ID!" : "click to copy RPC details ›"}
+            {copiedChain ? "✓ Copied Chain ID!" : "click to copy the chain ID ›"}
           </div>
         </div>
       </motion.div>
@@ -83,31 +124,27 @@ export const BentoMosaic: React.FC = () => {
             <CadIcon name="gauge" size="xs" blueprintBg />
           </div>
           <h5 className="font-sans font-extrabold text-lg sm:text-xl text-navy">
-            128-Hour Dark Market
+            When Wall Street Sleeps
           </h5>
           <p className="text-xs text-charcoal mt-1">
-            NYSE is closed. Robinhood Chain is wide open.
+            NYSE closes. Robinhood stock tokens keep trading on-chain.
           </p>
         </div>
 
-        {/* Live ticker simulation */}
+        {/* Live Chainlink prices (mainnet only) */}
         <div className="space-y-2 my-2">
-          <div className="bg-white/80 rounded-tag p-2 flex items-center justify-between text-xs">
-            <span className="font-bold font-mono">$GME-RWA</span>
-            <span className="text-coral font-extrabold font-mono">+24.8%</span>
-          </div>
-          <div className="bg-white/80 rounded-tag p-2 flex items-center justify-between text-xs">
-            <span className="font-bold font-mono">$TSLA-RWA</span>
-            <span className="text-navy font-extrabold font-mono">+11.2%</span>
-          </div>
-          <div className="bg-white/80 rounded-tag p-2 flex items-center justify-between text-xs">
-            <span className="font-bold font-mono">$NVDA-RWA</span>
-            <span className="text-coral font-extrabold font-mono">+19.4%</span>
-          </div>
+          {MAINNET_FEEDS.map(({ ticker }) => (
+            <div key={ticker} className="bg-white/80 rounded-tag p-2 flex items-center justify-between text-xs">
+              <span className="font-bold font-mono">${ticker}</span>
+              <span className="text-navy font-extrabold font-mono">
+                {prices[ticker] != null ? `$${prices[ticker]!.toFixed(2)}` : "—"}
+              </span>
+            </div>
+          ))}
         </div>
 
         <div className="text-[11px] font-mono font-bold text-navy/70 text-center bg-navy/10 py-1 rounded-tag">
-          Next Ambush: 04:00 PM EST
+          {targetChain.id === 4663 ? "Chainlink prices · 24/5" : "Live prices on mainnet"}
         </div>
       </motion.div>
 
@@ -123,12 +160,12 @@ export const BentoMosaic: React.FC = () => {
           <CadIcon name="mev" size="sm" blueprintBg className="animate-float" />
         </div>
         <div>
-          <div className="text-xs text-white/70">MEV Recycled to Retail</div>
+          <div className="text-xs text-white/70">Order-flow payments back to stakers</div>
           <div className="font-display font-black text-2xl sm:text-3xl text-butter">
-            $4,892,104
+            In design
           </div>
           <div className="text-[11px] text-pink font-semibold mt-0.5">
-            zero cuts to Wall Street brokers
+            not live yet
           </div>
         </div>
       </motion.div>
@@ -164,10 +201,10 @@ export const BentoMosaic: React.FC = () => {
             ★ BAKED FRESH EVERY BLOCK
           </div>
           <div className="font-display font-extrabold text-lg sm:text-2xl text-navy">
-            Asymmetric Alpha. Zero Hedge-Fund Fees.
+            No management or performance fees.
           </div>
           <p className="text-xs text-charcoal/80 mt-1">
-            Arbitrum Orbit settlement + Ethereum Blob DA security.
+            Withdraw any time. The basket&apos;s 0.3% deposit fee stays in the vault.
           </p>
         </div>
         <div className="flex-shrink-0 ml-4">

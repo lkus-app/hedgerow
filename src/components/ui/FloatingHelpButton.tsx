@@ -36,8 +36,8 @@ export const FloatingHelpButton: React.FC<FloatingHelpButtonProps> = ({
               </button>
             </div>
             <p className="text-xs text-charcoal/80 my-3 leading-relaxed">
-              Hey Outlaw! We are live on <strong>Robinhood Chain (L2 4663)</strong>.
-              Ready to sweep off-hours short borrow rates or stake in the first-ever <code>$WEALD</code> vault?
+              Hey Outlaw! Hedgerow is built on <strong>Robinhood Chain (ID 4663)</strong>.
+              Open the vault panel to see what is deployed and stake with your own wallet.
             </p>
             <button
               onClick={() => {

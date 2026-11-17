@@ -17,7 +17,8 @@
     "deploy:basket:testnet": "hardhat run scripts/deploy-basket.cjs --network robinhoodTestnet",
     "keeper:basket": "hardhat run scripts/basket-keeper.cjs",
     "deploy:basket:mainnet": "hardhat run scripts/deploy-basket.cjs --network robinhood",
-    "rehearse:basket:mainnet": "hardhat run scripts/deploy-basket.cjs"
+    "rehearse:basket:mainnet": "hardhat run scripts/deploy-basket.cjs",
+    "scenarios:basket:mainnet": "hardhat run scripts/basket-fork-scenarios.cjs"
   },
   "dependencies": {
     "canvas-confetti": "^1.9.3",

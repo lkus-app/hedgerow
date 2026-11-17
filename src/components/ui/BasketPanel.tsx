@@ -14,6 +14,7 @@ type State = {
   needsRebalance: boolean;
   depositsPaused: boolean;
   maxSlippageBps: number;
+  depositFeeBps: number;
   myShares: bigint;
   myEth?: bigint;
 };
@@ -43,12 +44,13 @@ export const BasketPanel: React.FC = () => {
     if (!basketVaultAddress) return;
     try {
       const vault = { address: basketVaultAddress, abi: basketVaultAbi } as const;
-      const [comp, totalSupply, needsRebalance, depositsPaused, maxSlippageBps] = await Promise.all([
+      const [comp, totalSupply, needsRebalance, depositsPaused, maxSlippageBps, depositFeeBps] = await Promise.all([
         reader.readContract({ ...vault, functionName: "composition" }),
         reader.readContract({ ...vault, functionName: "totalSupply" }),
         reader.readContract({ ...vault, functionName: "needsRebalance" }),
         reader.readContract({ ...vault, functionName: "depositsPaused" }),
         reader.readContract({ ...vault, functionName: "maxSlippageBps" }),
+        reader.readContract({ ...vault, functionName: "depositFeeBps" }),
       ]);
       const [tokens, weights, balances, values, , wethValueUsd, navUsd, pricesFresh] = comp;
       const meta = await Promise.all(
@@ -84,6 +86,7 @@ export const BasketPanel: React.FC = () => {
         needsRebalance,
         depositsPaused,
         maxSlippageBps,
+        depositFeeBps,
         myShares,
         myEth,
       });
@@ -291,7 +294,16 @@ export const BasketPanel: React.FC = () => {
                     {busy === "deposit" ? "depositing…" : "deposit"}
                   </button>
                 </div>
-                {state.depositsPaused && <p className="text-xs text-coral mt-1">Deposits are paused by the owner.</p>}
+                {state.depositsPaused ? (
+                  <p className="text-xs text-coral mt-1">Deposits are paused by the owner.</p>
+                ) : (
+                  state.totalSupply > 0n &&
+                  state.depositFeeBps > 0 && (
+                    <p className="text-xs text-charcoal/60 mt-1">
+                      {state.depositFeeBps / 100}% deposit fee, kept in the vault for existing holders.
+                    </p>
+                  )
+                )}
               </div>
 
               <div>

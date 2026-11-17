@@ -26,9 +26,15 @@ contract MockSwapRouter {
     mapping(address => address) public feedOf;
     uint256 public feeBps = 30;
     uint256 public executionBps = 10_000;
+    /// @notice Output token that fills 10% below oracle (simulates one thin or manipulated pool).
+    address public badTokenOut;
 
     function setFeed(address token, address feed) external {
         feedOf[token] = feed;
+    }
+
+    function setBadTokenOut(address t) external {
+        badTokenOut = t;
     }
 
     function setExecutionBps(uint256 bps) external {
@@ -55,6 +61,7 @@ contract MockSwapRouter {
         uint256 usd = (p.amountIn * _usdPrice(tokenIn)) / 10 ** IMockToken(tokenIn).decimals();
         out = (usd * 10 ** IMockToken(tokenOut).decimals()) / _usdPrice(tokenOut);
         out = (out * (10_000 - feeBps) * executionBps) / 10_000 / 10_000;
+        if (tokenOut == badTokenOut) out = (out * 9_000) / 10_000;
         require(out >= p.amountOutMinimum, "Too little received");
         require(IMockToken(tokenOut).transfer(p.recipient, out), "Router: pay failed");
     }

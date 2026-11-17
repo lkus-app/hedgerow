@@ -30,10 +30,10 @@ type Step =
   | { kind: "error"; message: string; hash?: Hash };
 
 const vaults: { id: VaultId; name: string; apy: string; risk: string; cadIcon: CadIconName }[] = [
-  { id: "GME", name: "$GME-RWA Sunday Squeeze", apy: "+64.2% APY", risk: "Wild", cadIcon: "rocket" },
-  { id: "NVDA", name: "$NVDA-RWA Dark Hours Straddle", apy: "+38.5% APY", risk: "Medium", cadIcon: "gauge" },
-  { id: "TSLA", name: "$TSLA-RWA Gamma Ladder", apy: "+48.9% APY", risk: "High", cadIcon: "gas" },
-  { id: "WEALD", name: "$WEALD Genesis Staking (OG)", apy: "+124.0% APY", risk: "OG Safe", cadIcon: "bow" },
+  { id: "GME", name: "$GME-RWA Sunday Squeeze", apy: "no fixed yield", risk: "Holds ETH", cadIcon: "rocket" },
+  { id: "NVDA", name: "$NVDA-RWA Dark Hours Straddle", apy: "no fixed yield", risk: "Holds ETH", cadIcon: "gauge" },
+  { id: "TSLA", name: "$TSLA-RWA Gamma Ladder", apy: "no fixed yield", risk: "Holds ETH", cadIcon: "gas" },
+  { id: "WEALD", name: "$WEALD Genesis Staking (OG)", apy: "no fixed yield", risk: "Holds ETH", cadIcon: "bow" },
 ];
 
 const fmt = (wei: bigint, digits = 4) => {

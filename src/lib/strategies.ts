@@ -258,15 +258,15 @@ export const strategies: Record<StrategyId, Strategy> = {
     mechanism: [
       {
         title: "Deposit ETH, get shares priced at NAV",
-        body: "Your ETH is valued with the Chainlink ETH/USD feed and you receive shares in proportion to the basket's current USD value. The ETH is held as WETH until the next rebalance.",
+        body: "Your ETH is valued with the Chainlink ETH/USD feed and you receive shares in proportion to the basket's current USD value, minus a 0.3% deposit fee that stays in the vault for existing holders. The ETH is held as WETH until the next rebalance.",
       },
       {
         title: "Rebalance back to target weights",
-        body: "When any slice drifts more than the drift band from its target (or idle ETH builds up), anyone can call rebalance(). It sells overweight tokens into WETH on Uniswap, then buys underweight ones.",
+        body: "When any slice drifts more than the drift band from its target (or idle ETH builds up), anyone can call rebalance(). It sells overweight tokens into WETH on Uniswap, then buys underweight ones, at most $500 per swap so large deposits are worked in over several calls.",
       },
       {
         title: "Oracle-bounded swaps",
-        body: "Every swap's minimum output is set from the Chainlink price minus the slippage limit (max 5%, set at 1%). A swap that would fill worse reverts, so a caller cannot route value out of the vault.",
+        body: "Every swap's minimum output is set from the Chainlink price minus the slippage limit (1.5%, hard cap 5%). A pool that would fill worse is skipped and retried later, so a caller cannot route value out of the vault.",
       },
       {
         title: "Withdraw in kind, any time",
@@ -320,7 +320,7 @@ export const strategies: Record<StrategyId, Strategy> = {
     ],
     risks: [
       "Contracts are not externally audited yet.",
-      "Displayed APYs are targets, not guaranteed or historical returns.",
+      "No yield is guaranteed. Vault value only rises when real profit is paid in or basket prices rise.",
     ],
     related: ["midnight", "gamma", "darkHours", "weald"],
   },
@@ -485,7 +485,7 @@ export const pages: Record<PageId, InfoPage> = {
       },
       {
         title: "$WEALD token",
-        body: "Supply starts at 0 with a hard cap of 100,000,000 WEALD. New tokens are minted by the controller each time a sweep is recorded, and the owner can also mint directly, always within the cap. The controller and owner can mark addresses as OG members.",
+        body: "15,000,000 WEALD (15%) is minted to the deployer at launch, with a hard cap of 100,000,000 WEALD. Sweeps no longer mint tokens; the owner can mint more, always within the cap. The controller and owner can mark addresses as OG members.",
       },
       {
         title: "Roadmap",

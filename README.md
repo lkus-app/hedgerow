@@ -128,6 +128,8 @@ A real, non-custodial index vault: deposit ETH, own a pro-rata slice of a weight
 
 - **Pricing:** Chainlink feeds (ETH/USD plus one per stock token), with a staleness limit per feed.
 - **Rebalancing:** `rebalance()` is permissionless. It sells overweight tokens into WETH and buys underweight ones on Uniswap (SwapRouter02 `exactInput`). Every swap's minimum output comes from the oracle price minus `maxSlippageBps` (hard cap 5%).
+- **Trade limits:** each swap is capped at `maxSwapUsd` ($500 by default), so large deposits are invested over several `rebalance()` calls. A pool that cannot fill within the oracle bound is skipped (`SwapSkipped`) and retried later; the call only reverts if no swap can fill.
+- **Deposit fee:** 0.3% on deposits into a non-empty basket (owner can set 0–1%). It stays in the vault for existing holders and offsets the gap between oracle and market prices.
 - **Withdrawals:** paid in kind (each token plus ETH). No swap or oracle is involved, so withdrawals work even when feeds are stale.
 - **Owner powers:** pause deposits and tune slippage, drift and cooldown within caps. The owner cannot move funds. Tokens, weights, feeds and swap paths are fixed at deployment.
 
@@ -149,6 +151,7 @@ BASKET_VAULT=0x... DEPLOYER_PRIVATE_KEY=0x... pnpm keeper:basket --network robin
 
 ```bash
 pnpm rehearse:basket:mainnet   # deploy + deposit + rebalance + withdraw on a local mainnet fork; nothing is broadcast
+pnpm scenarios:basket:mainnet  # sandwich, large-deposit and stale-feed scenarios on a mainnet fork
 ```
 
 PowerShell, to deploy for real (RPC: any Robinhood Chain mainnet endpoint, e.g. https://robinhood.drpc.org):

@@ -58,6 +58,15 @@ async function setup({ weights = [4000, 3000, 3000], slippage = 100, drift = 200
   return { owner, alice, bob, pc, weth, tokens, ethFeed, feeds, router, basket, components, asAlice: await as(alice), asBob: await as(bob) };
 }
 
+async function rebalanceFully(basket, max = 20) {
+  let calls = 0;
+  while ((await basket.read.needsRebalance()) && calls < max) {
+    await basket.write.rebalance();
+    calls++;
+  }
+  return calls;
+}
+
 async function weightsOf(basket) {
   const [, , , values, , wethValue, nav] = await basket.read.composition();
   return { values: values.map((v) => pct(v, nav)), idle: pct(wethValue, nav), nav };
@@ -80,6 +89,7 @@ describe("BasketVault", () => {
 
     const asBobBasket = await hre.viem.getContractAt("BasketVault", basket.address, { client: { wallet: bob } });
     await asBobBasket.write.rebalance(); // permissionless
+    await rebalanceFully(asBobBasket);
 
     const w = await weightsOf(basket);
     assert.ok(Math.abs(w.values[0] - 40) < 0.5, `TSLA ${w.values[0]}%`);
@@ -95,14 +105,14 @@ describe("BasketVault", () => {
   it("sells the overweight slice after a price move", async () => {
     const { basket, asAlice, feeds } = await setup();
     await asAlice.write.deposit([0n], { value: parseEther("1") });
-    await asAlice.write.rebalance();
+    await rebalanceFully(asAlice);
 
     await feeds[0].write.setAnswer([USD(500)]); // TSLA doubles
     let w = await weightsOf(basket);
     assert.ok(w.values[0] > 55, `TSLA drifted to ${w.values[0]}%`);
     assert.equal(await basket.read.needsRebalance(), true);
 
-    await asAlice.write.rebalance();
+    await rebalanceFully(asAlice);
     w = await weightsOf(basket);
     assert.ok(Math.abs(w.values[0] - 40) < 1, `TSLA back to ${w.values[0]}%`);
     assert.ok(Math.abs(w.values[1] - 30) < 1 && Math.abs(w.values[2] - 30) < 1);
@@ -111,13 +121,14 @@ describe("BasketVault", () => {
   it("prices later deposits against current NAV", async () => {
     const { basket, asAlice, asBob, bob, feeds } = await setup();
     await asAlice.write.deposit([0n], { value: parseEther("1") });
-    await asAlice.write.rebalance();
+    await rebalanceFully(asAlice);
     await feeds[0].write.setAnswer([USD(500)]); // basket gains value
 
     await asBob.write.deposit([0n], { value: parseEther("1") });
     const bobValue = await basket.read.valueOfShares([await basket.read.balanceOf([bob.account.address])]);
-    // Bob's slice is worth what he paid ($3000), not a share of Alice's gain.
-    assert.ok(bobValue > parseEther("2999") && bobValue <= parseEther("3000"), formatEther(bobValue));
+    // Bob pays a 0.3% fee ($9) that stays in the vault; he owns about half the vault afterwards,
+    // so about half of it comes back to him. He does not share in Alice's earlier gain.
+    assert.ok(bobValue > parseEther("2994") && bobValue < parseEther("2996"), formatEther(bobValue));
   });
 
   it("withdraw() pays out in kind and works even with stale prices", async () => {
@@ -156,7 +167,8 @@ describe("BasketVault", () => {
     const { basket, asAlice, router } = await setup({ slippage: 100 });
     await asAlice.write.deposit([0n], { value: parseEther("1") });
     await router.write.setExecutionBps([9800n]); // 2% worse than oracle
-    await assert.rejects(asAlice.write.rebalance(), /Too little received/);
+    // Every swap is skipped, so the call reverts instead of burning the cooldown.
+    await assert.rejects(asAlice.write.rebalance(), /no swap could fill/);
     // Nothing was traded.
     const [, , balances] = await basket.read.composition();
     assert.ok(balances.every((b) => b === 0n));
@@ -186,5 +198,51 @@ describe("BasketVault", () => {
     await assert.rejects(bad(ctx.components.map((c) => ({ ...c, weightBps: 3000 }))), /sum to 100%/);
     const swapped = ctx.components.map((c, i) => (i === 0 ? { ...c, buyPath: c.sellPath } : c));
     await assert.rejects(bad(swapped), /bad buy path/);
+  });
+  it("caps every swap at maxSwapUsd and finishes large rebalances over several calls", async () => {
+    const { basket, asAlice, pc } = await setup();
+    await asAlice.write.deposit([0n], { value: parseEther("2") }); // $6000 to invest
+    const calls = await rebalanceFully(asAlice);
+    assert.ok(calls >= 2, `took ${calls} calls`);
+    const logs = await pc.getContractEvents({ address: basket.address, abi: basket.abi, eventName: "Swapped", fromBlock: 0n });
+    const maxEthIn = parseEther("500") / 3000n + 1n; // $500 cap at $3000/ETH
+    for (const l of logs) assert.ok(l.args.amountIn <= maxEthIn, `swap of ${formatEther(l.args.amountIn)} WETH exceeds cap`);
+    const w = await weightsOf(basket);
+    assert.ok(Math.abs(w.values[0] - 40) < 2 && w.idle < 2, JSON.stringify(w.values));
+  });
+
+  it("keeps the deposit fee in the vault for existing holders", async () => {
+    const { basket, asAlice, asBob, alice } = await setup();
+    await asAlice.write.deposit([0n], { value: parseEther("1") });
+    const aliceShares = await basket.read.balanceOf([alice.account.address]);
+    const before = await basket.read.valueOfShares([aliceShares]);
+    await asBob.write.deposit([0n], { value: parseEther("1") });
+    const after = await basket.read.valueOfShares([aliceShares]);
+    // Bob's $9 fee stays in the vault; Alice owns about half of it afterwards, so she gains about $4.50.
+    assert.ok(after - before > parseEther("4.4") && after - before < parseEther("4.6"), formatEther(after - before));
+  });
+
+  it("bounds trade limits set by the owner", async () => {
+    const { basket, asAlice } = await setup();
+    await assert.rejects(asAlice.write.setTradeLimits([parseEther("1000"), 10]), /not owner/);
+    await assert.rejects(basket.write.setTradeLimits([parseEther("1"), 10]), /swap cap too low/);
+    await assert.rejects(basket.write.setTradeLimits([parseEther("1000"), 101]), /fee cap/);
+    await basket.write.setTradeLimits([parseEther("5000"), 0]);
+    assert.equal(await basket.read.maxSwapUsd(), parseEther("5000"));
+    assert.equal(await basket.read.depositFeeBps(), 0);
+  });
+  it("skips one pool that cannot fill and still trades the others", async () => {
+    const { basket, asAlice, router, tokens, pc } = await setup();
+    await asAlice.write.deposit([0n], { value: parseEther("0.2") }); // $600
+    await router.write.setBadTokenOut([tokens[1].address]); // NVDA pool fills 10% below oracle
+    await asAlice.write.rebalance();
+    const [, , balances] = await basket.read.composition();
+    assert.ok(balances[0] > 0n && balances[2] > 0n, "TSLA and T-Bill were bought");
+    assert.equal(balances[1], 0n, "NVDA swap was skipped");
+    const skipped = await pc.getContractEvents({ address: basket.address, abi: basket.abi, eventName: "SwapSkipped", fromBlock: 0n });
+    assert.equal(skipped.length, 1);
+    await router.write.setBadTokenOut(["0x0000000000000000000000000000000000000000"]);
+    await rebalanceFully(asAlice);
+    assert.ok((await basket.read.composition())[2][1] > 0n, "NVDA bought once its pool recovered");
   });
 });

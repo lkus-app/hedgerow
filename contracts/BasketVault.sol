@@ -93,6 +93,14 @@ contract BasketVault {
     uint16 public driftBps; // rebalance allowed when any slice is off target by more than this share of NAV
     uint32 public rebalanceCooldown;
     uint64 public lastRebalance;
+    /// @notice Largest single swap (USD, 18 decimals). Bigger imbalances are worked off over several
+    ///         rebalance() calls, so thin pools never block the basket.
+    uint256 public maxSwapUsd = 500e18;
+    /// @notice Fee on deposits into a non-empty basket. It stays in the vault for existing holders and
+    ///         covers the gap between oracle prices (which update on deviation/heartbeat) and the market.
+    uint16 public depositFeeBps = 30;
+    uint256 public constant MIN_SWAP_USD_CAP = 10e18;
+    uint16 public constant MAX_DEPOSIT_FEE_BPS = 100;
 
     uint256 public totalSupply;
     mapping(address => uint256) public balanceOf;
@@ -103,9 +111,11 @@ contract BasketVault {
     event Deposit(address indexed user, uint256 ethIn, uint256 usdValue, uint256 shares);
     event Withdraw(address indexed user, uint256 shares, uint256 ethOut);
     event Swapped(address indexed tokenIn, address indexed tokenOut, uint256 amountIn, uint256 amountOut);
+    event SwapSkipped(address indexed tokenIn, address indexed tokenOut, uint256 amountIn, uint256 minOut);
     event Rebalanced(address indexed caller, uint256 navBefore, uint256 navAfter);
     event ParamsUpdated(uint16 maxSlippageBps, uint16 driftBps, uint32 rebalanceCooldown);
     event DepositsPaused(bool paused);
+    event TradeLimitsUpdated(uint256 maxSwapUsd, uint16 depositFeeBps);
     event OwnershipTransferred(address indexed from, address indexed to);
 
     modifier nonReentrant() {
@@ -271,7 +281,8 @@ contract BasketVault {
             require(depositUsd > MIN_LIQUIDITY, "Basket: deposit too small");
             return depositUsd - MIN_LIQUIDITY;
         }
-        return (depositUsd * totalSupply) / totalValue();
+        uint256 netUsd = (depositUsd * (BPS - depositFeeBps)) / BPS;
+        return (netUsd * totalSupply) / totalValue();
     }
 
     /// @notice True when rebalance() would do something and the cooldown has passed.
@@ -350,6 +361,7 @@ contract BasketVault {
         (,,, uint256[] memory valuesUsd,,, uint256 navBefore,) = composition();
         uint256 n = components.length;
         uint256 band = (navBefore * driftBps) / BPS;
+        uint256 traded;
 
         uint256[] memory prices = new uint256[](n);
         for (uint256 i = 0; i < n; i++) {
@@ -362,9 +374,10 @@ contract BasketVault {
             uint256 target = (navBefore * c.weightBps) / BPS;
             if (valuesUsd[i] <= target + band) continue;
             uint256 sellUsd = valuesUsd[i] - target;
+            if (sellUsd > maxSwapUsd) sellUsd = maxSwapUsd;
             uint256 amountIn = (sellUsd * 10 ** c.tokenDecimals) / prices[i];
             uint256 expectedWeth = (sellUsd * 1e18) / ethPrice;
-            _swap(c.sellPath, address(c.token), address(weth), amountIn, expectedWeth);
+            if (_swap(c.sellPath, address(c.token), address(weth), amountIn, expectedWeth)) traded++;
         }
 
         // 2) Buy underweight slices with WETH, never spending more than we hold.
@@ -373,6 +386,7 @@ contract BasketVault {
             uint256 target = (navBefore * c.weightBps) / BPS;
             if (valuesUsd[i] >= target) continue;
             uint256 buyUsd = target - valuesUsd[i];
+            if (buyUsd > maxSwapUsd) buyUsd = maxSwapUsd;
             uint256 wethIn = (buyUsd * 1e18) / ethPrice;
             uint256 available = weth.balanceOf(address(this));
             if (wethIn > available) {
@@ -381,20 +395,32 @@ contract BasketVault {
             }
             if (wethIn == 0) continue;
             uint256 expectedOut = (buyUsd * 10 ** c.tokenDecimals) / prices[i];
-            _swap(c.buyPath, address(weth), address(c.token), wethIn, expectedOut);
+            if (_swap(c.buyPath, address(weth), address(c.token), wethIn, expectedOut)) traded++;
         }
 
+        // If no pool could fill, revert so the cooldown is not consumed and keepers see the failure.
+        require(traded > 0, "Basket: no swap could fill");
         emit Rebalanced(msg.sender, navBefore, totalValue());
     }
 
-    function _swap(bytes memory path, address tokenIn, address tokenOut, uint256 amountIn, uint256 expectedOut) internal {
-        if (amountIn == 0) return;
+    /// @dev Returns false (and leaves balances untouched) when the pool cannot fill within the
+    ///      oracle-derived minimum, so one thin or manipulated pool never blocks the others.
+    function _swap(bytes memory path, address tokenIn, address tokenOut, uint256 amountIn, uint256 expectedOut)
+        internal
+        returns (bool)
+    {
+        if (amountIn == 0) return false;
         uint256 minOut = (expectedOut * (BPS - maxSlippageBps)) / BPS;
-        uint256 out = router.exactInput(
+        try router.exactInput(
             ISwapRouter02.ExactInputParams({path: path, recipient: address(this), amountIn: amountIn, amountOutMinimum: minOut})
-        );
-        require(out >= minOut, "Basket: slippage");
-        emit Swapped(tokenIn, tokenOut, amountIn, out);
+        ) returns (uint256 out) {
+            require(out >= minOut, "Basket: slippage");
+            emit Swapped(tokenIn, tokenOut, amountIn, out);
+            return true;
+        } catch {
+            emit SwapSkipped(tokenIn, tokenOut, amountIn, minOut);
+            return false;
+        }
     }
 
     function _usdOfEth(uint256 amount) internal view returns (uint256) {
@@ -412,6 +438,14 @@ contract BasketVault {
         driftBps = _driftBps;
         rebalanceCooldown = _rebalanceCooldown;
         emit ParamsUpdated(_maxSlippageBps, _driftBps, _rebalanceCooldown);
+    }
+
+    function setTradeLimits(uint256 _maxSwapUsd, uint16 _depositFeeBps) external onlyOwner {
+        require(_maxSwapUsd >= MIN_SWAP_USD_CAP, "Basket: swap cap too low");
+        require(_depositFeeBps <= MAX_DEPOSIT_FEE_BPS, "Basket: fee cap");
+        maxSwapUsd = _maxSwapUsd;
+        depositFeeBps = _depositFeeBps;
+        emit TradeLimitsUpdated(_maxSwapUsd, _depositFeeBps);
     }
 
     function setDepositsPaused(bool paused) external onlyOwner {

@@ -5,7 +5,7 @@ const accounts = process.env.DEPLOYER_PRIVATE_KEY ? [process.env.DEPLOYER_PRIVAT
 // `pnpm rehearse:basket:mainnet` forks mainnet without needing env-var syntax that differs per shell.
 const FORK_URL =
   process.env.FORK_URL ||
-  (process.env.npm_lifecycle_event === "rehearse:basket:mainnet"
+  (["rehearse:basket:mainnet", "scenarios:basket:mainnet"].includes(process.env.npm_lifecycle_event)
     ? process.env.RH_MAINNET_RPC_URL || "https://robinhood.drpc.org"
     : undefined);
 

@@ -6,9 +6,9 @@
   "router": "0xCaf681a66D020601342297493863E78C959E5cb2",
   "ethUsdFeed": "0x78F3556b67E17Df817D51Ef5a990cDaF09E8d3A9",
   "ethMaxStaleness": 86400,
-  "maxSlippageBps": 100,
+  "maxSlippageBps": 150,
   "driftBps": 200,
-  "rebalanceCooldown": 3600,
+  "rebalanceCooldown": 60,
   "components": [
     {
       "label": "NVDA",

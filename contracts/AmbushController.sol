@@ -83,18 +83,14 @@ contract AmbushController {
     ) external payable onlySentinel {
         AmbushTarget storage target = targets[targetKey];
         require(target.vaultAddress != address(0), "Controller: target not found");
+        // A sweep records real profit; an empty sweep would only produce a misleading event.
+        require(msg.value > 0, "Controller: no profit");
         target.shortBorrowAPR = reportedAPR;
         target.lastAmbushTime = block.timestamp;
 
-        // Forward profit to vault
-        if (msg.value > 0) {
-            IHedgerowVault(target.vaultAddress).recordAmbushProfit{value: msg.value}(msg.value);
-        }
-
-        // Mint incentive $WEALD rewards to participating stakers
-        if (wealdToken != address(0)) {
-            IWealdToken(wealdToken).mintAmbushReward(target.vaultAddress, 500 * 10**18);
-        }
+        // Forward the profit to the vault, raising every staker's share value pro rata.
+        // (No $WEALD is minted here: the vault cannot hold or pass on reward tokens.)
+        IHedgerowVault(target.vaultAddress).recordAmbushProfit{value: msg.value}(msg.value);
 
         emit AmbushTriggered(targetKey, target.ticker, reportedAPR, msg.value);
     }

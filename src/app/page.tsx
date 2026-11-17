@@ -29,51 +29,55 @@ export default function Home() {
   // Case study data
   const caseStudies: (CaseStudyItem & { strategy: StrategyId })[] = [
     {
-      eyebrow: "Epoch #001 · Robinhood Chain L2",
-      title: "The Sunday Squeeze: GameStop ($GME-RWA) Ambush",
+      eyebrow: "Strategy 01 · $GME-RWA vault",
+      title: "Midnight Ambush: lending into weekend short squeezes",
       description:
-        "When traditional brokers halted weekend trading, overleveraged shorts left 4.2M shares unhedged. The Friar AI sentinel activated an automated liquidity sweep, returning +382.4% gamma yield directly to retail vault stakers.",
-      tags: ["Off-Hours Ambush", "Short Borrow 142%", "Robinhood Chain L2", "Arbitrum Orbit"],
+        "When the stock market closes, short sellers who must stay hedged pay rising borrow fees for tokenized shares. The strategy lends into those spikes and pays the fee into the vault. The vault contract handles deposits and withdrawals; the lending is not automated yet, so the vault only earns when profit is paid in.",
+      tags: ["Off-hours", "Borrow fees", "ETH vault", "Withdraw any time"],
       accentColor: "pink",
-      statLabel: "Total Squeeze Profits Recycled",
-      statValue: "$2.84M USD",
+      statLabel: "Status",
+      statValue: "Vault contract · strategy manual",
       illustrationType: "squeeze",
+      live: true,
       strategy: "midnight",
     },
     {
-      eyebrow: "Epoch #002 · Dark Hours Engine",
-      title: "NVIDIA ($NVDA-RWA) Post-Earnings Delta Straddle",
+      eyebrow: "Strategy 02 · $NVDA-RWA vault",
+      title: "Dark Hours Straddle: providing liquidity around earnings",
       description:
-        "Baking volatility fresh out of the oven. At 4:05 PM EST, traditional Wall Street spreads blew out to $14. Our synthetic AMM curve absorbed retail flow at zero slippage and captured the TradFi gap upon Monday's opening bell.",
-      tags: ["Earnings Straddle", "Zero PFOF", "Synthetic Delta", "24/7 Trading"],
+        "Earnings land after the 4:00 PM ET close, when traditional spreads widen. The strategy places liquidity on both sides of the tokenized stock and earns swap fees from the move. The vault contract handles deposits and withdrawals; the liquidity strategy is not automated yet, so the vault only earns when profit is paid in.",
+      tags: ["Earnings", "Two-sided liquidity", "ETH vault", "Withdraw any time"],
       accentColor: "butter",
-      statLabel: "Arbitrage Spread Harvested",
-      statValue: "+$1.15M USDC",
+      statLabel: "Status",
+      statValue: "Vault contract · strategy manual",
       illustrationType: "straddle",
+      live: true,
       strategy: "darkHours",
     },
     {
-      eyebrow: "Epoch #003 · Autonomous Agents",
-      title: "Friar-1 AI Sentinel: The Citadel Killer",
+      eyebrow: "Strategy 03 · Equity Basket",
+      title: "Equity Basket: NVDA, META, AAPL and TSLA in one deposit",
       description:
-        "Autonomous algorithmic highwayman running directly in the EVM. Batches retail swaps into private mempool bundles, front-running predatory high-frequency traders and redistributing 100% of MEV rebates to $WEALD stakers.",
-      tags: ["AI-Native Agent", "Reverse PFOF", "Zero Gas Griefing", "Anti-Frontrun"],
+        "Fully on-chain. Deposit ETH, own a slice of a weighted basket of Robinhood stock tokens priced by Chainlink. Anyone can trigger the rebalance, every swap is bounded by the oracle price, and withdrawals pay out the tokens themselves at any time.",
+      tags: ["On-chain", "Chainlink", "Uniswap", "Withdraw in kind"],
       accentColor: "coral",
-      statLabel: "Retail Order Flow Protected",
-      statValue: "100% MEV Rebated",
+      statLabel: "Status",
+      statValue: "Contract built and tested",
       illustrationType: "sentinel",
-      strategy: "sentinel",
+      live: true,
+      strategy: "baskets",
     },
     {
-      eyebrow: "Epoch #004 · Tokenized Equities",
-      title: "Tesla ($TSLA-RWA) Weekend Liquidity Harvest",
+      eyebrow: "Strategy 04 · $TSLA-RWA vault",
+      title: "Gamma Pies: a ladder of strikes above the price",
       description:
-        "Traditional markets lock retail out for 63 hours every weekend. Hedgerow pools capital into automated call-ladders and spot accumulation, turning after-hours illiquidity into an asymmetric financial weapon.",
-      tags: ["Weekend AMM", "Tokenized Stock", "Yield Vault", "Chain ID 4663"],
+        "Capital is split into single-sided liquidity ranges above the current price, behaving like call options without time decay. The vault contract handles deposits and withdrawals; placing the ranges is not automated yet, so the vault only earns when profit is paid in.",
+      tags: ["Liquidity ladder", "No time decay", "ETH vault", "Withdraw any time"],
       accentColor: "sky",
-      statLabel: "Off-Market Volume Settled",
-      statValue: "$8.9M 24h Vol",
+      statLabel: "Status",
+      statValue: "Vault contract · strategy manual",
       illustrationType: "arbitrage",
+      live: true,
       strategy: "gamma",
     },
   ];
@@ -342,7 +346,7 @@ export default function Home() {
 
             <div className="p-4 bg-white/30 rounded-card backdrop-blur-sm border border-white/40">
               <span className="text-xs font-mono font-bold text-navy uppercase block mb-1">
-                The Outlaw Guarantee
+                The Outlaw Code
               </span>
               <p className="font-sans italic text-sm text-navy leading-snug">
                 no dark pools. no payment for order flow. just fresh croissants and pure retail vengeance. 🥐✨
@@ -361,32 +365,32 @@ export default function Home() {
             <ServiceCard
               badge="Vault #02"
               title="asymmetric gamma pies"
-              description="automated synthetic call ladders for tokenized equities on robinhood chain with zero theta decay and concentrated liquidity."
+              description="ladders of single-sided liquidity above the price of a tokenized stock: call-like upside with no time decay."
               onClick={() => openStrategy("gamma")}
             />
             <ServiceCard
               badge="Autonomous"
               title="friar ai sentinels"
-              description="on-chain AI micro-agents scanning SEC 13F filings, borrow rates, and dark order book imbalances in real-time."
+              description="the off-chain agent that watches borrow rates and earnings and is the only key allowed to pay profit into vaults."
               onClick={() => openStrategy("sentinel")}
             />
             <ServiceCard
               badge="Yield Engine"
               title="reverse-pfof sprinkles"
-              description="extracts MEV from institutional market makers and batches orders, dropping 100% of the arb profits back to stakers."
+              description="a design to batch orders and let market makers bid for them, returning the payment to stakers. not live yet."
               onClick={() => openStrategy("reversePfof")}
             />
             <ServiceCard
               badge="RWA Vault"
               title="tokenized equity baskets"
-              description="24/7 compounded yield vaults holding tokenized US stocks, treasuries, and native ETH simultaneously."
+              description="one ETH deposit buys a weighted basket of robinhood stock tokens, priced by chainlink and rebalanced on uniswap."
               onClick={() => openStrategy("baskets")}
             />
             <ServiceCard
               isOutline
               badge="All Strategies"
               title="overview of all vaults"
-              description="explore the open-source contracts, audited by the Greenwood Guild on Robinhood Chain testnet & mainnet."
+              description="every vault, its contract address and its status. the contracts are open source and not yet externally audited."
               onClick={() => openStrategy("overview")}
             />
           </div>
@@ -399,7 +403,7 @@ export default function Home() {
       <InsetSection id="strategies" bg="surface">
         <div className="mb-8">
           <span className="font-sans font-bold text-pink text-sm uppercase tracking-wider block mb-2">
-            live ambush epochs
+            how each strategy works
           </span>
           <ScriptHeading lines={["FRESH OUT", "THE OVEN"]} color="coral" size="normal" />
         </div>
@@ -447,9 +451,9 @@ export default function Home() {
         {/* 2-Column Grid of Pill Tiles (--lavender, 8px radius, 75px tall) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
           {[
-            { label: "tokenized tech equities (RWA)", count: "8 pools", strategy: "baskets" as StrategyId },
-            { label: "weekend crypto-tradfi arbitrage", count: "128 hrs/wk", strategy: "gamma" as StrategyId },
-            { label: "high short-interest meme assets", count: "142% apr", strategy: "midnight" as StrategyId },
+            { label: "tokenized tech equities (RWA)", count: "4 in the basket", strategy: "baskets" as StrategyId },
+            { label: "weekend crypto-tradfi arbitrage", count: "nights & weekends", strategy: "gamma" as StrategyId },
+            { label: "high short-interest meme assets", count: "borrow spikes", strategy: "midnight" as StrategyId },
             { label: "after-hours earnings announcements", count: "4:00 PM EST", strategy: "darkHours" as StrategyId },
             { label: "overnight treasury yield curve", count: "US-TBill", strategy: "baskets" as StrategyId },
             { label: "autonomous AI agent order flows", count: "EVM-Native", strategy: "sentinel" as StrategyId },
@@ -635,12 +639,12 @@ export default function Home() {
                 </li>
                 <li>
                   <a
-                    href="https://github.com"
+                    href="https://github.com/lkus-app/hedgerow"
                     target="_blank"
                     rel="noreferrer"
                     className="hover:text-butter transition-colors inline-flex items-center gap-1"
                   >
-                    Audits &amp; Contracts <span className="text-sky">↗</span>
+                    Source code (not yet audited) <span className="text-sky">↗</span>
                   </a>
                 </li>
                 <li>
