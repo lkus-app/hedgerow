@@ -25,6 +25,8 @@ async function main() {
   const pc = await hre.viem.getPublicClient();
   const chainId = await pc.getChainId();
   if (chainId === 31337) fail("use `pnpm deploy:basket:local` on the local chain.");
+  // On a fork, mine one local block so reads run at a block the fork node owns.
+  if (hre.network.name === "hardhat") await pc.request({ method: "hardhat_mine", params: ["0x1"] });
 
   const file = path.join(__dirname, "..", "config", `basket.${chainId}.json`);
   if (!fs.existsSync(file)) {
@@ -107,12 +109,50 @@ async function main() {
     Number(cfg.rebalanceCooldown),
   ]);
 
+  if (hre.network.name === "hardhat") {
+    // FORK_URL rehearsal: nothing is broadcast, so exercise the vault against the real pools and feeds.
+    await rehearse(basket, pc, deployer);
+    return;
+  }
+
   const out = { chainId, deployer: deployer.account.address, basketVault: basket.address, config: cfg };
   const dir = path.join(__dirname, "..", "deployments");
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(path.join(dir, `basket-${chainId}.json`), JSON.stringify(out, null, 2) + "\n");
   console.log("BasketVault", basket.address);
   console.log(`\nAdd to your env:\nNEXT_PUBLIC_BASKET_VAULT=${basket.address}`);
+}
+
+async function rehearse(basket, pc, deployer) {
+  const { parseEther, formatEther } = require("viem");
+  const show = async (label) => {
+    const [tokens, , balances, values, , wethValue, nav, fresh] = await basket.read.composition();
+    console.log(`\n${label}: NAV $${Number(formatEther(nav)).toFixed(2)} (prices fresh: ${fresh})`);
+    for (let i = 0; i < tokens.length; i++) {
+      const pct = nav ? Number((values[i] * 10000n) / nav) / 100 : 0;
+      console.log(`  ${tokens[i]}  ${formatEther(balances[i])}  $${Number(formatEther(values[i])).toFixed(2)}  ${pct}%`);
+    }
+    console.log(`  idle WETH $${Number(formatEther(wethValue)).toFixed(2)}`);
+  };
+  const wait = async (hash) => {
+    const r = await pc.waitForTransactionReceipt({ hash });
+    if (r.status !== "success") throw new Error(`tx ${hash} reverted`);
+    return r;
+  };
+
+  console.log("\nREHEARSAL on a mainnet fork (nothing is broadcast)");
+  const amount = parseEther(process.env.REHEARSE_ETH || "0.002");
+  await wait(await basket.write.deposit([0n], { value: amount }));
+  await show(`After depositing ${formatEther(amount)} ETH`);
+  const r = await wait(await basket.write.rebalance());
+  console.log(`\nrebalance() gas used: ${r.gasUsed}`);
+  await show("After rebalance");
+  const shares = await basket.read.balanceOf([deployer.account.address]);
+  const before = await pc.getBalance({ address: deployer.account.address });
+  await wait(await basket.write.withdraw([shares]));
+  const after = await pc.getBalance({ address: deployer.account.address });
+  console.log(`\nWithdrew all shares in kind; ETH change incl. gas: ${formatEther(after - before)}`);
+  await show("After withdraw");
 }
 
 main().catch((e) => {

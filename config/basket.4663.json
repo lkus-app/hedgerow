@@ -1,0 +1,46 @@
+{
+  "_sources": "Verified 2026-11-17. WETH = SwapRouter02.WETH9() on-chain. SwapRouter02 from developers.uniswap.org/deployments.json (v3-swaprouter02-robinhood-chain). Feeds from docs.chain.link (Robinhood Chain Mainnet, standard proxies). Tokens are the Robinhood-issued contracts (name '<Company> • Robinhood Token', uiMultiplier() present). Pools: Uniswap v3 WETH/<token> pools with the deepest liquidity at check time; spot price within 0.3% of Chainlink.",
+  "name": "Hedgerow Equity Basket",
+  "symbol": "hBASKET",
+  "weth": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+  "router": "0xCaf681a66D020601342297493863E78C959E5cb2",
+  "ethUsdFeed": "0x78F3556b67E17Df817D51Ef5a990cDaF09E8d3A9",
+  "ethMaxStaleness": 86400,
+  "maxSlippageBps": 100,
+  "driftBps": 200,
+  "rebalanceCooldown": 3600,
+  "components": [
+    {
+      "label": "NVDA",
+      "token": "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
+      "feed": "0x379EC4f7C378F34a1B47E4F3cbeBCbAC3E8E9F15",
+      "weightBps": 4000,
+      "maxStaleness": 86400,
+      "poolFee": 500
+    },
+    {
+      "label": "META",
+      "token": "0xc0D6457C16Cc70d6790Dd43521C899C87ce02f35",
+      "feed": "0x7C38C00C30BEe9378381E7B6135d7283356D71b1",
+      "weightBps": 2500,
+      "maxStaleness": 86400,
+      "poolFee": 3000
+    },
+    {
+      "label": "AAPL",
+      "token": "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9",
+      "feed": "0x6B22A786bAa607d76728168703a39Ea9C99f2cD0",
+      "weightBps": 2000,
+      "maxStaleness": 86400,
+      "poolFee": 500
+    },
+    {
+      "label": "TSLA",
+      "token": "0x322F0929c4625eD5bAd873c95208D54E1c003b2d",
+      "feed": "0x4A1166a659A55625345e9515b32adECea5547C38",
+      "weightBps": 1500,
+      "maxStaleness": 86400,
+      "poolFee": 3000
+    }
+  ]
+}

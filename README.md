@@ -143,6 +143,24 @@ DEPLOYER_PRIVATE_KEY=0x... pnpm deploy:basket:testnet
 BASKET_VAULT=0x... DEPLOYER_PRIVATE_KEY=0x... pnpm keeper:basket --network robinhoodTestnet
 ```
 
+### Robinhood Chain mainnet
+
+`config/basket.4663.json` holds verified mainnet addresses: WETH (read from SwapRouter02), Uniswap SwapRouter02, Chainlink ETH/USD, and the Robinhood-issued NVDA, META, AAPL and TSLA tokens with their Chainlink feeds and deepest Uniswap v3 WETH pools. Robinhood Chain **testnet** has no Uniswap deployment and no Chainlink feeds, so the basket only runs for real on mainnet.
+
+```bash
+pnpm rehearse:basket:mainnet   # deploy + deposit + rebalance + withdraw on a local mainnet fork; nothing is broadcast
+```
+
+PowerShell, to deploy for real (RPC: any Robinhood Chain mainnet endpoint, e.g. https://robinhood.drpc.org):
+
+```powershell
+$env:RH_MAINNET_RPC_URL="https://robinhood.drpc.org"
+$env:DEPLOYER_PRIVATE_KEY="0x..."
+pnpm deploy:basket:mainnet
+```
+
+Stock feeds only update during US equity sessions (24/5), so deposits and rebalances pause on weekends while withdrawals keep working.
+
 The basket is not externally audited. Mock contracts in `contracts/mocks/` are for local tests only.
 
 ---
