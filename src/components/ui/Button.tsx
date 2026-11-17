@@ -42,11 +42,12 @@ export const Button: React.FC<ButtonProps> = ({
       )}
 
       {shimmer && (
-        <span className="absolute inset-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12 animate-shimmer-slide pointer-events-none" />
+        <span className="absolute inset-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer-slide pointer-events-none" />
       )}
 
       <span className="flex items-center gap-2 relative z-10">
-        <span>{children}</span>
+        {/* The chevron below is always added, so drop one typed into the label. */}
+        <span>{typeof children === "string" ? children.replace(/\s*›\s*$/, "") : children}</span>
         <span className="inline-block transition-transform duration-200 ease-out group-hover:translate-x-1 font-sans text-xl">
           ›
         </span>

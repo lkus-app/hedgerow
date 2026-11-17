@@ -60,7 +60,11 @@ contract AmbushController {
         string memory ticker,
         address vaultAddress
     ) external onlyOwner {
+        require(vaultAddress != address(0), "Controller: zero vault");
         bytes32 key = keccak256(abi.encodePacked(ticker));
+        if (targets[key].vaultAddress == address(0)) {
+            activeTargetKeys.push(key);
+        }
         targets[key] = AmbushTarget({
             ticker: ticker,
             vaultAddress: vaultAddress,
@@ -68,7 +72,6 @@ contract AmbushController {
             isOffHoursActive: true,
             lastAmbushTime: block.timestamp
         });
-        activeTargetKeys.push(key);
     }
 
     /**

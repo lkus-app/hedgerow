@@ -69,7 +69,7 @@ export const BlogCard: React.FC<BlogCardProps> = ({ post, onClick }) => {
           <span className="font-medium text-sky group-hover:translate-x-1 transition-transform inline-flex items-center gap-1 font-bold">
             read field report <span>›</span>
           </span>
-          <span className="font-mono">#OG-00{Math.floor(Math.random() * 8 + 1)}</span>
+          <span className="font-mono">#OG-00{(post.title.length % 8) + 1}</span>
         </div>
       </div>
     </motion.div>

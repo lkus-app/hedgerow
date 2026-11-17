@@ -102,6 +102,26 @@ pnpm start
 
 ---
 
+## ⛓️ On-chain Setup
+
+The staking modal sends a real `deposit()` transaction to a `HedgerowVault` through the visitor's browser wallet (MetaMask or any EIP-1193 wallet). It connects the wallet, switches to (or adds) the target network, checks the ETH balance, simulates the call, sends it, waits for the receipt and links the tx in the explorer. If no vault address is configured for the network, the button is disabled. Nothing is faked.
+
+```bash
+pnpm contracts:test                     # Hardhat tests for the vault + controller
+
+# Local end-to-end
+pnpm chain:local                        # terminal 1
+pnpm deploy:local                       # terminal 2 -> prints NEXT_PUBLIC_* lines
+# paste them into .env.local, then: pnpm dev
+
+# Robinhood Chain Testnet (get test ETH: https://faucet.testnet.chain.robinhood.com)
+DEPLOYER_PRIVATE_KEY=0x... pnpm deploy:testnet
+```
+
+Copy `.env.example` to `.env.local` and fill in the vault addresses printed by the deploy script (they are also saved to `deployments/<chainId>.json`). Restart `pnpm dev` after editing env vars, because Next.js inlines `NEXT_PUBLIC_*` at build time.
+
+---
+
 ## 🛡️ Network Parameters (Robinhood Chain)
 
 | Parameter | Mainnet | Testnet |
@@ -111,7 +131,8 @@ pnpm start
 | **Gas Token** | ETH | Sepolia ETH |
 | **Rollup Framework** | Arbitrum Orbit L2 | Arbitrum Orbit L2 |
 | **Data Availability** | Ethereum Blobs | Ethereum Sepolia |
-| **Block Explorer** | `robinhoodchain.blockscout.com` | `robinhoodchain-testnet.blockscout.com` |
+| **Public RPC** | `rpc.mainnet.chain.robinhood.com` | `rpc.testnet.chain.robinhood.com` |
+| **Block Explorer** | `robinhoodchain.blockscout.com` | `explorer.testnet.chain.robinhood.com` |
 
 ---
 

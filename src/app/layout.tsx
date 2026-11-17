@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Providers } from "@/components/Providers";
 
 export const metadata: Metadata = {
   title: "HEDGEROW — Asymmetric Alpha & Anti-Short Engine on Robinhood Chain",
@@ -30,7 +31,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased selection:bg-pink selection:text-navy">
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

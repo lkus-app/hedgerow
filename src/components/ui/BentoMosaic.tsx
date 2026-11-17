@@ -120,7 +120,7 @@ export const BentoMosaic: React.FC = () => {
           <span className="text-xs font-mono font-bold text-pink uppercase bg-white/10 px-2 py-0.5 rounded-tag">
             Reverse PFOF
           </span>
-          <CadIcon name="mev" size="sm" blueprintBg className="animate-bounce" />
+          <CadIcon name="mev" size="sm" blueprintBg className="animate-float" />
         </div>
         <div>
           <div className="text-xs text-white/70">MEV Recycled to Retail</div>
@@ -171,7 +171,7 @@ export const BentoMosaic: React.FC = () => {
           </p>
         </div>
         <div className="flex-shrink-0 ml-4">
-          <CadIcon name="rocket" size="lg" blueprintBg className="animate-wiggle" />
+          <CadIcon name="rocket" size="lg" blueprintBg className="animate-float" />
         </div>
       </motion.div>
     </div>

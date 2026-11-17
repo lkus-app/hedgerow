@@ -125,6 +125,7 @@ export default function Home() {
             initial={{ opacity: 0, x: "100%" }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: "100%" }}
+            transition={{ type: "tween", duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
             className="fixed inset-0 z-50 bg-sky p-8 flex flex-col justify-between"
           >
             <div className="flex items-center justify-between pb-6 border-b border-navy/20">

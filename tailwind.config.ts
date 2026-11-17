@@ -38,8 +38,8 @@ const config: Config = {
       },
       keyframes: {
         'shimmer-slide': {
-          '0%': { transform: 'translateX(-100%)' },
-          '100%': { transform: 'translateX(200%)' },
+          '0%': { transform: 'translateX(-100%) skewX(-12deg)' },
+          '100%': { transform: 'translateX(300%) skewX(-12deg)' },
         },
         'spin-around': {
           '0%': { transform: 'rotate(0deg)' },

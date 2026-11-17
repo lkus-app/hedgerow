@@ -46,14 +46,11 @@ export const CaseStudy: React.FC<CaseStudyProps> = ({
       <div className="relative w-full lg:w-[50%] max-w-[540px]">
         {/* Offset background solid color block */}
         <motion.div
-          initial={{ opacity: 0, x: isRight ? -40 : 40, y: 30 }}
+          initial={{ opacity: 0, x: 0, y: 0 }}
           whileInView={{ opacity: 1, x: isRight ? -50 : 50, y: 20 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
           className={`absolute inset-0 rounded-card ${colorClasses[item.accentColor]} z-0 hidden sm:block`}
-          style={{
-            transform: isRight ? "translate(-50px, 20px)" : "translate(50px, 20px)",
-          }}
         />
 
         {/* Foreground Media / Interactive Graphic Card */}
